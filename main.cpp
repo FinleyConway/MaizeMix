@@ -7,15 +7,14 @@ int main()
 {
 	AudioEngine engine;
 
-	AudioClip musicClip = AudioClip("/home/finley/GameShiz/Sounds/TestMusic.wav", false);
-	AudioClip soundClip = AudioClip("/home/finley/GameShiz/Sounds/Pew.wav", false);
+	AudioClip soundClip = AudioClip("/home/finley/Desktop/pew.wav", false);
 
 	sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
 
 	bool is = false;
 	float currentTime = 0;
 
-	engine.PlaySound(musicClip, 100, 1, true);
+	engine.PlaySound(soundClip, 100, 1, true);
 
 	while (window.isOpen())
 	{
@@ -31,13 +30,15 @@ int main()
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
-			engine.StopSound(musicClip);
+			engine.StopSound(soundClip);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 		{
-			engine.PlaySound(musicClip, 100, 1, true);
+			engine.PlaySound(soundClip, 100, 1, true);
 		}
 
 		engine.Update(0);
+
+        std::cout << (int)engine.GetCurrentAudioCount() << std::endl;
 	}
 }

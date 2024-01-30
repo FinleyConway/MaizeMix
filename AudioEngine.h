@@ -19,18 +19,6 @@ class AudioEngine
 	void Update(float currentTime);
 
  private:
-	struct Sound
-	{
-		sf::Sound sound;
-		std::shared_ptr<const sf::SoundBuffer> buffer = nullptr;
-
-		Sound() = default;
-		Sound(const sf::Sound& audio, const std::shared_ptr<const sf::SoundBuffer>& buffer)
-		: sound(audio), buffer(buffer)
-		{
-		}
-	};
-
 	struct SoundEventData
 	{
 		int16_t clipID = -1;
@@ -49,9 +37,23 @@ class AudioEngine
 		}
 	};
 
+    struct Sound
+    {
+        sf::Sound sound;
+        std::shared_ptr<const sf::SoundBuffer> buffer = nullptr;
+        const SoundEventData* event = nullptr;
+
+        Sound() = default;
+        Sound(const sf::Sound& audio, const std::shared_ptr<const sf::SoundBuffer>& buffer, const SoundEventData* event)
+                : sound(audio), buffer(buffer), event(event)
+        {
+        }
+    };
+
+public:
  	uint8_t GetCurrentAudioCount()
 	{
-		 return 0;
+		 return m_SoundEventQueue.size();
 	}
 
  private:

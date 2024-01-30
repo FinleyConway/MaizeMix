@@ -25,8 +25,8 @@ void AudioEngine::PlaySound(const AudioClip& clip, float volume, float pitch, bo
 			stopTime = clip.GetDuration();
 		}
 
-		m_SoundEventQueue.emplace(clip.m_ClipID, stopTime);
-		m_CurrentPlayingSounds.try_emplace(clip.m_ClipID, sound, buffer);
+		const auto& event = m_SoundEventQueue.emplace(clip.m_ClipID, stopTime);
+		m_CurrentPlayingSounds.try_emplace(clip.m_ClipID, sound, buffer, &(*event.first));
 
 		m_CurrentPlayingSounds[clip.m_ClipID].sound.play();
 	}
@@ -40,7 +40,8 @@ void AudioEngine::StopSound(const AudioClip& clip)
 
 		soundData.sound.stop();
 
-		//m_SoundEventQueue.erase(); need to find a way to remove this efficiently
+        if (soundData.event != nullptr)
+		    m_SoundEventQueue.erase(*soundData.event);
 		m_CurrentPlayingSounds.erase(clip.m_ClipID);
 	}
 }

@@ -20,7 +20,6 @@ add_executable(AudioEngine
         AudioClip.h
         AudioRequester.cpp
         AudioRequester.h
-        SparseSet.h
         AudioEngine.cpp
         AudioEngine.h
 )
