@@ -39,6 +39,11 @@ uint32_t AudioClip::GetFrequency() const
 	return AudioRequester::GetClipFrequency(*this);
 }
 
+bool AudioClip::IsLoadInBackground() const
+{
+	return m_IsStreaming;
+}
+
 AudioClip::LoadState AudioClip::GetLoadState() const
 {
 	return m_LoadState;

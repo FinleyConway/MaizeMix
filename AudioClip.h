@@ -16,6 +16,7 @@ class AudioClip
 	uint32_t GetChannels() const;
 	float GetDuration() const;
 	uint32_t GetFrequency() const;
+	bool IsLoadInBackground() const;
 	LoadState GetLoadState() const;
 
 	bool operator==(const AudioClip& other) const;
