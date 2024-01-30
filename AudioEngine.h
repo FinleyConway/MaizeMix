@@ -14,10 +14,21 @@ class AudioEngine
 {
  public:
 	void PlaySound(const AudioClip& clip, float volume, float pitch, bool loop);
+    void PlaySoundAtPosition(const AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
     void PauseSound(const AudioClip& clip);
     void MuteSound(const AudioClip& clip);
     void UnMuteSound(const AudioClip& clip);
 	void StopSound(const AudioClip& clip);
+
+    static void SetListenerPosition(float x, float y, float depth)
+    {
+        sf::Listener::setPosition(x, y, depth);
+    }
+
+    static void SetGlobalVolume(float volume)
+    {
+        sf::Listener::setGlobalVolume(volume);
+    }
 
 	void Update(float currentTime);
 
@@ -54,8 +65,13 @@ class AudioEngine
         }
     };
 
-public:
- 	uint8_t GetCurrentAudioCount()
+private:
+    float LimitVolume(float volume) const
+    {
+        return std::clamp(volume, 0.0f, 100.0f);;
+    }
+
+ 	uint8_t GetCurrentAudioCount() const
 	{
 		 return m_SoundEventQueue.size();
 	}
