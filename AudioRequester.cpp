@@ -16,10 +16,10 @@ AudioRequester::LoadInfo AudioRequester::LoadClip(const std::string& audioPath, 
 			return LoadInfo(id, true);
 		}
 	}
-		// handle audio that will be loaded into memory
+	// handle audio that will be loaded into memory
 	else
 	{
-		auto buffer = std::make_unique<sf::SoundBuffer>();
+		auto buffer = std::make_shared<sf::SoundBuffer>();
 
 		if (buffer->loadFromFile(audioPath))
 		{
@@ -52,6 +52,21 @@ void AudioRequester::UnloadClip(AudioClip& clip)
 		s_SoundEmitters.erase(clip.m_ClipID);
 		clip.m_LoadState = AudioClip::LoadState::Unloaded;
 		clip.m_ClipID = -1;
+	}
+}
+
+std::shared_ptr<const sf::SoundBuffer> AudioRequester::GetClipData(const AudioClip& clip)
+{
+	if (clip.m_ClipID == -1) return nullptr;
+
+	if (clip.m_IsStreaming)
+	{
+		// not implemented yet
+		return nullptr;
+	}
+	else
+	{
+		return s_SoundEmitters.at(clip.m_ClipID);
 	}
 }
 

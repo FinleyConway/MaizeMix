@@ -23,6 +23,7 @@ class AudioClip
 
  private:
 	friend class AudioRequester;
+	friend class AudioEngine;
 
 	int16_t m_ClipID = -1;
 	LoadState m_LoadState = LoadState::Unloaded;

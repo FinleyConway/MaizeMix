@@ -21,6 +21,8 @@ add_executable(AudioEngine
         AudioRequester.cpp
         AudioRequester.h
         SparseSet.h
+        AudioEngine.cpp
+        AudioEngine.h
 )
 
 # Link sfml
