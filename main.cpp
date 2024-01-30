@@ -30,7 +30,16 @@ int main()
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
-			engine.StopSound(soundClip);
+            if (is)
+            {
+                engine.UnMuteSound(soundClip);
+                is = false;
+            }
+            else
+            {
+                engine.MuteSound(soundClip);
+                is = true;
+            }
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 		{

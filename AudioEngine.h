@@ -14,6 +14,9 @@ class AudioEngine
 {
  public:
 	void PlaySound(const AudioClip& clip, float volume, float pitch, bool loop);
+    void PauseSound(const AudioClip& clip);
+    void MuteSound(const AudioClip& clip);
+    void UnMuteSound(const AudioClip& clip);
 	void StopSound(const AudioClip& clip);
 
 	void Update(float currentTime);
@@ -23,7 +26,6 @@ class AudioEngine
 	{
 		int16_t clipID = -1;
 		float stopTime = 0;
-		//float previousVolume = 0;
 
 		SoundEventData() = default;
 		SoundEventData(int16_t clip, float stopTime)
@@ -42,6 +44,8 @@ class AudioEngine
         sf::Sound sound;
         std::shared_ptr<const sf::SoundBuffer> buffer = nullptr;
         const SoundEventData* event = nullptr;
+
+        float previousVolume = 0;
 
         Sound() = default;
         Sound(const sf::Sound& audio, const std::shared_ptr<const sf::SoundBuffer>& buffer, const SoundEventData* event)

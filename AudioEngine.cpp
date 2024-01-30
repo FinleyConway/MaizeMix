@@ -32,6 +32,39 @@ void AudioEngine::PlaySound(const AudioClip& clip, float volume, float pitch, bo
 	}
 }
 
+void AudioEngine::PauseSound(const AudioClip& clip)
+{
+    if (m_CurrentPlayingSounds.contains(clip.m_ClipID))
+    {
+        auto& soundData = m_CurrentPlayingSounds.at(clip.m_ClipID);
+
+        soundData.sound.pause();
+
+        m_SoundEventQueue.erase(*soundData.event);
+    }
+}
+
+void AudioEngine::MuteSound(const AudioClip &clip)
+{
+    if (m_CurrentPlayingSounds.contains(clip.m_ClipID))
+    {
+        auto& soundData = m_CurrentPlayingSounds.at(clip.m_ClipID);
+
+        soundData.previousVolume = soundData.sound.getVolume();
+        soundData.sound.setVolume(0);
+    }
+}
+
+void AudioEngine::UnMuteSound(const AudioClip &clip)
+{
+    if (m_CurrentPlayingSounds.contains(clip.m_ClipID))
+    {
+        auto& soundData = m_CurrentPlayingSounds.at(clip.m_ClipID);
+
+        soundData.sound.setVolume(soundData.previousVolume);
+    }
+}
+
 void AudioEngine::StopSound(const AudioClip& clip)
 {
 	if (m_CurrentPlayingSounds.contains(clip.m_ClipID))
