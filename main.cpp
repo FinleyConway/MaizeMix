@@ -7,14 +7,14 @@ int main()
 {
     AudioEngine engine;
 
-    AudioClip soundClip = AudioClip("/home/finley/Desktop/pew.wav", false);
+    AudioClip soundClip = AudioClip("TestAudio/Pew.wav", false);
 
     sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
 
     bool is = false;
     float currentTime = 0;
 
-    AudioEngine::SetListenerPosition(0, 0, 0);
+    engine.SetListenerPosition(0, 0, 0);
 
     float x = 0, y = 0;
 
@@ -34,30 +34,18 @@ int main()
 
         float deltaTime = clock.restart().asSeconds();
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        {
-            if (is)
-            {
-                engine.UnMuteSound(soundClip);
-                is = false;
-            }
-            else
-            {
-                engine.MuteSound(soundClip);
-                is = true;
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !is)
         {
             engine.PlaySoundAtPosition(soundClip, 100, 1, true, 0, 0, 0, 5.0f, 10.0f);
+			is = true;
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) y -= 100 * deltaTime;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) y += 100 * deltaTime;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) x += 100 * deltaTime;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) x -= 100 * deltaTime;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) y -= 10 * deltaTime;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) y += 10 * deltaTime;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) x += 10 * deltaTime;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) x -= 10 * deltaTime;
 
-        AudioEngine::SetListenerPosition(x, y, 0);
+        engine.SetListenerPosition(x, y, 0);
 
         engine.Update(0);
     }

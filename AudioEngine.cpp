@@ -4,6 +4,8 @@
 
 void AudioEngine::PlaySound(const AudioClip& clip, float volume, float pitch, bool loop)
 {
+	if (clip.m_ClipID == -1) return;
+
     if (GetCurrentAudioCount() >= c_MaxAudioEmitters)
     {
         std::cerr << "Warning: Max audio reached!" << std::endl;
@@ -39,6 +41,8 @@ void AudioEngine::PlaySound(const AudioClip& clip, float volume, float pitch, bo
 
 void AudioEngine::PlaySoundAtPosition(const AudioClip &clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance)
 {
+	if (clip.m_ClipID == -1) return;
+
     if (GetCurrentAudioCount() >= c_MaxAudioEmitters)
     {
         std::cerr << "Warning: Max audio reached!" << std::endl;

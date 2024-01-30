@@ -20,13 +20,17 @@ class AudioEngine
     void UnMuteSound(const AudioClip& clip);
 	void StopSound(const AudioClip& clip);
 
-    static void SetListenerPosition(float x, float y, float depth)
+    void SetListenerPosition(float x, float y, float depth)
     {
+		if (m_CurrentPlayingSounds.empty()) return;
+
         sf::Listener::setPosition(x, y, depth);
     }
 
-    static void SetGlobalVolume(float volume)
+	void SetGlobalVolume(float volume)
     {
+		if (m_CurrentPlayingSounds.empty()) return;
+
         sf::Listener::setGlobalVolume(volume);
     }
 
