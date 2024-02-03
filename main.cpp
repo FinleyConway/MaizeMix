@@ -7,16 +7,11 @@ int main()
 {
     AudioEngine engine;
 
-    AudioClip soundClip = AudioClip("TestAudio/Pew.wav", false);
+	auto clip = engine.CreateClip("TestAudio/Pew.wav", false);
 
     sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
 
-    bool is = false;
-    float currentTime = 0;
-
-    engine.SetListenerPosition(0, 0, 0);
-
-    float x = 0, y = 0;
+	uint8_t id = 0;
 
     sf::Clock clock;
 
@@ -32,20 +27,17 @@ int main()
             }
         }
 
-        float deltaTime = clock.restart().asSeconds();
+        //float deltaTime = clock.restart().asSeconds();
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !is)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
         {
-            engine.PlaySoundAtPosition(soundClip, 100, 1, true, 0, 0, 0, 5.0f, 10.0f);
-			is = true;
+			id = engine.PlaySound(clip, 100, 1, true);
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) y -= 10 * deltaTime;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) y += 10 * deltaTime;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) x += 10 * deltaTime;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) x -= 10 * deltaTime;
-
-        engine.SetListenerPosition(x, y, 0);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+		{
+			engine.SetAudioState(id, AudioState::Stop);
+		}
 
         engine.Update(0);
     }

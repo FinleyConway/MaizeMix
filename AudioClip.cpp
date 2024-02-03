@@ -1,52 +1,15 @@
 #include "AudioClip.h"
-#include "AudioRequester.h"
 
-AudioClip::AudioClip(const std::string& audioPath, bool stream)
+AudioClip::AudioClip(int16_t clipID, uint32_t channels, float duration, uint32_t frequency, bool stream, AudioClip::LoadState loadState) :
+	m_ClipID(clipID), m_Channels(channels), m_Duration(duration), m_Frequency(frequency), m_IsStreaming(stream), m_LoadState(loadState)
 {
-	const auto clip = AudioRequester::LoadClip(audioPath, stream);
 
-	if (clip.wasSuccessful)
-	{
-		m_ClipID = clip.clipID;
-		m_LoadState = LoadState::Loaded;
-	}
-	else
-	{
-		m_ClipID = -1;
-		m_LoadState = LoadState::Failed;
-	}
-
-	m_IsStreaming = stream;
 }
 
-AudioClip::~AudioClip()
+AudioClip::AudioClip(int16_t clipID, bool stream, AudioClip::LoadState loadState) :
+	m_ClipID(clipID), m_IsStreaming(stream), m_LoadState(loadState)
 {
-	AudioRequester::UnloadClip(*this);
-}
 
-uint32_t AudioClip::GetChannels() const
-{
-	return AudioRequester::GetClipChannel(*this);
-}
-
-float AudioClip::GetDuration() const
-{
-	return AudioRequester::GetClipDuration(*this);
-}
-
-uint32_t AudioClip::GetFrequency() const
-{
-	return AudioRequester::GetClipFrequency(*this);
-}
-
-bool AudioClip::IsLoadInBackground() const
-{
-	return m_IsStreaming;
-}
-
-AudioClip::LoadState AudioClip::GetLoadState() const
-{
-	return m_LoadState;
 }
 
 bool AudioClip::operator==(const AudioClip& other) const

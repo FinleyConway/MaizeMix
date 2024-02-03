@@ -3,36 +3,37 @@
 #include <SFML/Audio.hpp>
 
 #include <unordered_map>
-#include <cstdint>
-#include <cmath>
-#include <iostream>
 #include <memory>
+#include <set>
 
 class AudioClip;
+
+enum class AudioState
+{
+	Pause,
+	Mute,
+	Unmute,
+	Stop
+};
 
 class AudioEngine
 {
  public:
-	void PlaySound(const AudioClip& clip, float volume, float pitch, bool loop);
+	AudioClip CreateClip(const std::string& audioPath, bool stream);
+	void DestroyClip(AudioClip& clip);
+
+	uint8_t PlaySound(const AudioClip& clip, float volume, float pitch, bool loop);
     void PlaySoundAtPosition(const AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
-    void PauseSound(const AudioClip& clip);
-    void MuteSound(const AudioClip& clip);
-    void UnMuteSound(const AudioClip& clip);
-	void StopSound(const AudioClip& clip);
 
-    void SetListenerPosition(float x, float y, float depth)
-    {
-		if (m_CurrentPlayingSounds.empty()) return;
+	void UpdateSoundLoopState(uint8_t audioSourceID, bool loop);
+	void UpdateSoundVolume(uint8_t audioSourceID, float volume);
+	void UpdateSoundPitch(uint8_t audioSourceID, float pitch);
+	void UpdateSoundPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance);
 
-        sf::Listener::setPosition(x, y, depth);
-    }
+	void SetAudioState(uint8_t audioSourceID, AudioState audioState);
 
-	void SetGlobalVolume(float volume)
-    {
-		if (m_CurrentPlayingSounds.empty()) return;
-
-        sf::Listener::setGlobalVolume(volume);
-    }
+    void SetListenerPosition(float x, float y, float depth);
+	void SetGlobalVolume(float volume);
 
 	void Update(float currentTime);
 
@@ -57,19 +58,23 @@ class AudioEngine
     struct Sound
     {
         sf::Sound sound;
-        std::shared_ptr<const sf::SoundBuffer> buffer = nullptr;
         const SoundEventData* event = nullptr;
 
         float previousVolume = 0;
 
         Sound() = default;
-        Sound(const sf::Sound& audio, const std::shared_ptr<const sf::SoundBuffer>& buffer, const SoundEventData* event)
-                : sound(audio), buffer(buffer), event(event)
+        Sound(const sf::Sound& audio, const SoundEventData* event)
+                : sound(audio), event(event)
         {
         }
     };
 
 private:
+	void PauseSound(Sound& soundData);
+	void MuteSound(Sound& soundData);
+	void UnmuteSound(Sound& soundData);
+	void StopSound(uint8_t audioSourceID, Sound& soundData);
+
     float LimitVolume(float volume) const
     {
         return std::clamp(volume, 0.0f, 100.0f);;
@@ -81,7 +86,10 @@ private:
 	}
 
  private:
-	std::unordered_map<int16_t, Sound> m_CurrentPlayingSounds;
+	std::unordered_map<int16_t, std::shared_ptr<sf::SoundBuffer>> m_SoundBuffers;
+	std::unordered_map<int16_t, std::shared_ptr<sf::Music>> m_Music;
+
+	std::unordered_map<uint8_t, Sound> m_CurrentPlayingSounds;
  	std::set<SoundEventData> m_SoundEventQueue;
 
 	const uint8_t c_MaxAudioEmitters = 250;

@@ -18,8 +18,6 @@ add_executable(AudioEngine
         main.cpp
         AudioClip.cpp
         AudioClip.h
-        AudioRequester.cpp
-        AudioRequester.h
         AudioEngine.cpp
         AudioEngine.h
 )
