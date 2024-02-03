@@ -85,7 +85,7 @@ uint8_t AudioEngine::PlaySound(const AudioClip& clip, float volume, float pitch,
 		}
 		else
 		{
-			stopTime = clip.GetDuration();
+			stopTime = m_CurrentTime.asSeconds() + clip.GetDuration();
 		}
 
 		const auto& event = m_SoundEventQueue.emplace(clip.m_ClipID, stopTime);
@@ -167,7 +167,7 @@ void AudioEngine::UpdateSoundLoopState(uint8_t audioSourceID, bool loop)
 		else
 		{
 			// figure out if i should set the length or current playing offset
-			stopTime = soundData.sound.getPlayingOffset().asSeconds(); // needs testing
+			stopTime = m_CurrentTime.asSeconds() + soundData.sound.getPlayingOffset().asSeconds(); // needs testing
 		}
 
 		m_SoundEventQueue.emplace(audioSourceID, stopTime);
@@ -230,10 +230,13 @@ void AudioEngine::SetAudioState(uint8_t audioSourceID, AudioState audioState)
 	}
 }
 
-void AudioEngine::Update(float currentTime)
+void AudioEngine::Update(float deltaTime)
 {
+	// update audio system time
+	m_CurrentTime += sf::seconds(deltaTime);
+
 	// remove all finished sounds
-	while (!m_SoundEventQueue.empty() && currentTime >= m_SoundEventQueue.begin()->stopTime)
+	while (!m_SoundEventQueue.empty() && m_CurrentTime.asSeconds() >= m_SoundEventQueue.begin()->stopTime)
 	{
 		m_SoundEventQueue.erase(m_SoundEventQueue.begin());
 		m_CurrentPlayingSounds.erase(m_SoundEventQueue.begin()->clipID);
@@ -242,14 +245,14 @@ void AudioEngine::Update(float currentTime)
 
 void AudioEngine::SetListenerPosition(float x, float y, float depth)
 {
-	if (m_CurrentPlayingSounds.empty()) return;
+	if (GetCurrentAudioCount() > 0) return;
 
 	sf::Listener::setPosition(x, y, depth);
 }
 
 void AudioEngine::SetGlobalVolume(float volume)
 {
-	if (m_CurrentPlayingSounds.empty()) return;
+	if (GetCurrentAudioCount() > 0) return;
 
 	sf::Listener::setGlobalVolume(LimitVolume(volume));
 }

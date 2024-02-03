@@ -35,13 +35,13 @@ class AudioEngine
     void SetListenerPosition(float x, float y, float depth);
 	void SetGlobalVolume(float volume);
 
-	void Update(float currentTime);
+	void Update(float deltaTime);
 
  private:
 	struct SoundEventData
 	{
-		int16_t clipID = -1;
-		float stopTime = 0;
+		const int16_t clipID = -1;
+		const float stopTime = 0;
 
 		SoundEventData() = default;
 		SoundEventData(int16_t clip, float stopTime)
@@ -80,12 +80,15 @@ private:
         return std::clamp(volume, 0.0f, 100.0f);;
     }
 
+ public:
  	uint8_t GetCurrentAudioCount() const
 	{
 		 return m_SoundEventQueue.size();
 	}
 
  private:
+	sf::Time m_CurrentTime;
+
 	std::unordered_map<int16_t, std::shared_ptr<sf::SoundBuffer>> m_SoundBuffers;
 	std::unordered_map<int16_t, std::shared_ptr<sf::Music>> m_Music;
 

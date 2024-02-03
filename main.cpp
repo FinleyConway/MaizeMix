@@ -1,5 +1,7 @@
 #include <SFML/Window.hpp>
 
+#include <iostream>
+
 #include "AudioClip.h"
 #include "AudioEngine.h"
 
@@ -27,18 +29,25 @@ int main()
             }
         }
 
-        //float deltaTime = clock.restart().asSeconds();
+        float deltaTime = clock.restart().asSeconds();
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        {
-			id = engine.PlaySound(clip, 100, 1, true);
-        }
+		static bool spaceKeyPressed = false;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
-			engine.SetAudioState(id, AudioState::Stop);
+			if (!spaceKeyPressed)
+			{
+				engine.PlaySound(clip, 100, 1, false);
+				spaceKeyPressed = true;
+			}
+		}
+		else
+		{
+			spaceKeyPressed = false;
 		}
 
-        engine.Update(0);
+        engine.Update(deltaTime);
+
+		std::cout << (int)engine.GetCurrentAudioCount() << std::endl;
     }
 }
