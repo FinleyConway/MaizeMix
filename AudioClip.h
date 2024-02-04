@@ -21,7 +21,6 @@ class AudioClip
 	bool operator==(const AudioClip& other) const;
 
  private:
-	friend class AudioRequester;
 	friend class AudioEngine;
 
 	AudioClip(int16_t clipID, uint32_t channels, float duration, uint32_t frequency, bool stream, LoadState loadState);

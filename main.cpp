@@ -9,7 +9,8 @@ int main()
 {
     AudioEngine engine;
 
-	auto clip = engine.CreateClip("TestAudio/Pew.wav", false);
+	//auto sound = engine.CreateClip("TestAudio/Pew.wav", false);
+	auto music = engine.CreateClip("/home/finley/GameShiz/Sounds/TestMusic.wav", true);
 
     sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
 
@@ -37,7 +38,7 @@ int main()
 		{
 			if (!spaceKeyPressed)
 			{
-				engine.PlaySound(clip, 100, 1, false);
+				engine.PlaySound(music, 100, 1, false);
 				spaceKeyPressed = true;
 			}
 		}
@@ -48,6 +49,6 @@ int main()
 
         engine.Update(deltaTime);
 
-		std::cout << (int)engine.GetCurrentAudioCount() << std::endl;
+		//std::cout << (int)engine.GetCurrentAudioCount() << std::endl;
     }
 }

@@ -3,6 +3,7 @@
 #include <SFML/Audio.hpp>
 
 #include <unordered_map>
+#include <variant>
 #include <memory>
 #include <set>
 
@@ -55,25 +56,29 @@ class AudioEngine
 		}
 	};
 
-    struct Sound
+    struct Audio
     {
-        sf::Sound sound;
+        std::variant<sf::Sound, sf::Music*> sound;
         const SoundEventData* event = nullptr;
 
         float previousVolume = 0;
 
-        Sound() = default;
-        Sound(const sf::Sound& audio, const SoundEventData* event)
+        Audio() = default;
+        Audio(sf::Music* audio, const SoundEventData* event)
+			: sound(audio), event(event)
+		{
+		}
+        Audio(const sf::Sound& audio, const SoundEventData* event)
                 : sound(audio), event(event)
         {
         }
     };
 
 private:
-	void PauseSound(Sound& soundData);
-	void MuteSound(Sound& soundData);
-	void UnmuteSound(Sound& soundData);
-	void StopSound(uint8_t audioSourceID, Sound& soundData);
+	void PauseSound(Audio& soundData);
+	void MuteSound(Audio& soundData);
+	void UnmuteSound(Audio& soundData);
+	void StopSound(uint8_t audioSourceID, Audio& soundData);
 
     float LimitVolume(float volume) const
     {
@@ -83,7 +88,21 @@ private:
  public:
  	uint8_t GetCurrentAudioCount() const
 	{
-		 return m_SoundEventQueue.size();
+		 return m_AudioEventQueue.size();
+	}
+
+	float GetPlayingOffset(const std::variant<sf::Sound, sf::Music*>& soundVariant)
+	{
+		if (auto* music = std::get_if<sf::Music*>(&soundVariant))
+		{
+			return (*music)->getPlayingOffset().asSeconds();
+		}
+		else if (auto* sound = std::get_if<sf::Sound>(&soundVariant))
+		{
+			return sound->getPlayingOffset().asSeconds();
+		}
+
+		return 0.0f;
 	}
 
  private:
@@ -92,8 +111,8 @@ private:
 	std::unordered_map<int16_t, std::shared_ptr<sf::SoundBuffer>> m_SoundBuffers;
 	std::unordered_map<int16_t, std::shared_ptr<sf::Music>> m_Music;
 
-	std::unordered_map<uint8_t, Sound> m_CurrentPlayingSounds;
- 	std::set<SoundEventData> m_SoundEventQueue;
+	std::unordered_map<uint8_t, Audio> m_CurrentPlayingSounds;
+ 	std::set<SoundEventData> m_AudioEventQueue;
 
 	const uint8_t c_MaxAudioEmitters = 250;
 };
