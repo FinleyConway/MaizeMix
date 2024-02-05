@@ -23,10 +23,10 @@ class AudioClip
  private:
 	friend class AudioEngine;
 
-	AudioClip(int16_t clipID, uint32_t channels, float duration, uint32_t frequency, bool stream, LoadState loadState);
-	AudioClip(int16_t clipID, bool stream, LoadState loadState);
+	AudioClip(size_t clipID, uint32_t channels, float duration, uint32_t frequency, bool stream, LoadState loadState);
+	AudioClip(size_t clipID, bool stream, LoadState loadState);
 
-	int16_t m_ClipID = -1;
+	size_t m_ClipID = 0;
 	LoadState m_LoadState = LoadState::Unloaded;
 
 	uint32_t m_Channels = 0;

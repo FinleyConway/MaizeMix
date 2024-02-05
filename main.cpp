@@ -1,7 +1,5 @@
 #include <SFML/Window.hpp>
 
-#include <iostream>
-
 #include "AudioClip.h"
 #include "AudioEngine.h"
 
@@ -9,12 +7,10 @@ int main()
 {
     AudioEngine engine;
 
-	//auto sound = engine.CreateClip("TestAudio/Pew.wav", false);
+	auto sound = engine.CreateClip("TestAudio/Pew.wav", false);
 	auto music = engine.CreateClip("/home/finley/GameShiz/Sounds/TestMusic.wav", true);
 
     sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
-
-	uint8_t id = 0;
 
     sf::Clock clock;
 
@@ -38,7 +34,7 @@ int main()
 		{
 			if (!spaceKeyPressed)
 			{
-				engine.PlaySound(music, 100, 1, false);
+				engine.PlaySound(sound, 30, 1, false);
 				spaceKeyPressed = true;
 			}
 		}
@@ -47,8 +43,21 @@ int main()
 			spaceKeyPressed = false;
 		}
 
-        engine.Update(deltaTime);
+		static bool spaceKeyPressed1 = false;
 
-		//std::cout << (int)engine.GetCurrentAudioCount() << std::endl;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
+		{
+			if (!spaceKeyPressed1)
+			{
+				engine.PlaySound(music, 30, 1, false);
+				spaceKeyPressed1 = true;
+			}
+		}
+		else
+		{
+			spaceKeyPressed1 = false;
+		}
+
+        engine.Update(deltaTime);
     }
 }
