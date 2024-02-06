@@ -23,7 +23,7 @@ class AudioClip
  private:
 	friend class AudioEngine;
 
-	AudioClip(size_t clipID, uint32_t channels, float duration, uint32_t frequency, bool stream, LoadState loadState);
+	AudioClip(const std::string& filePath, size_t clipID, uint32_t channels, float duration, uint32_t frequency, bool stream, LoadState loadState);
 	AudioClip(size_t clipID, bool stream, LoadState loadState);
 
 	size_t m_ClipID = 0;
@@ -33,4 +33,7 @@ class AudioClip
 	float m_Duration = 0;
 	uint32_t m_Frequency = 0;
 	bool m_IsStreaming = false;
+
+	size_t m_RefCounter = 0; // temp solution
+	std::string m_FilePath;
 };

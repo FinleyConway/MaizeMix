@@ -33,8 +33,8 @@ class AudioEngine
 	AudioClip CreateClip(const std::string& audioPath, bool stream);
 	void DestroyClip(AudioClip& clip);
 
-	uint8_t PlaySound(const AudioClip& clip, float volume, float pitch, bool loop);
-	uint8_t PlaySoundAtPosition(const AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
+	uint8_t PlaySound(AudioClip& clip, float volume, float pitch, bool loop);
+	uint8_t PlaySoundAtPosition(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
 
 	void UpdateSoundLoopState(uint8_t audioSourceID, bool loop);
 	void UpdateSoundVolume(uint8_t audioSourceID, float volume);
@@ -74,13 +74,13 @@ class AudioEngine
 
     struct Audio
     {
-        std::variant<sf::Sound, sf::Music*> sound;
+        std::variant<sf::Sound, std::shared_ptr<sf::Music>> sound;
         const SoundEventData* event = nullptr;
 
         float previousVolume = 0;
 
         Audio() = default;
-        Audio(sf::Music* audio, const SoundEventData* event)
+        Audio(const std::shared_ptr<sf::Music>& audio, const SoundEventData* event)
 			: sound(audio), event(event)
 		{
 		}
@@ -93,7 +93,7 @@ class AudioEngine
 private:
 	float LimitVolume(float volume) const;
 	bool HasHitMaxAudioSources() const;
-	float GetPlayingOffset(const std::variant<sf::Sound, sf::Music*>& soundVariant);
+	float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<sf::Music>>& soundVariant);
 
 	void PauseSound(Audio& soundData);
 	void MuteSound(Audio& soundData);
@@ -101,7 +101,7 @@ private:
 	void StopSound(uint8_t audioSourceID, Audio& soundData);
 
 	uint8_t PlayAudio(const AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
-	uint8_t PlayStreamedAudio(const AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
+	uint8_t PlayStreamedAudio(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
 
 	uint8_t GetNextID()
 	{
