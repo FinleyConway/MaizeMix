@@ -47,6 +47,7 @@ AudioClip AudioEngine::CreateClip(const std::string& audioPath, bool stream)
 
 void AudioEngine::DestroyClip(AudioClip& clip)
 {
+	// remove clip
 	if (clip.m_IsStreaming)
 	{
 		m_Music.erase(clip.m_ClipID);
@@ -56,6 +57,7 @@ void AudioEngine::DestroyClip(AudioClip& clip)
 		m_SoundBuffers.erase(clip.m_ClipID);
 	}
 
+	// set clip to default
 	clip = AudioClip();
 }
 
@@ -189,6 +191,10 @@ void AudioEngine::SetAudioState(uint8_t audioSourceID, AudioState audioState)
 	{
 		PauseSound(soundData);
 	}
+	else if (audioState == AudioState::Unpause)
+	{
+		UnpauseSound(audioSourceID, soundData);
+	}
 	else if (audioState == AudioState::Mute)
 	{
 		MuteSound(soundData);
@@ -222,14 +228,14 @@ void AudioEngine::Update(float deltaTime)
 
 void AudioEngine::SetListenerPosition(float x, float y, float depth)
 {
-	if (HasHitMaxAudioSources()) return;
+	if (m_CurrentPlayingSounds.empty()) return;
 
 	sf::Listener::setPosition(x, y, depth);
 }
 
 void AudioEngine::SetGlobalVolume(float volume)
 {
-	if (HasHitMaxAudioSources()) return;
+	if (m_CurrentPlayingSounds.empty()) return;
 
 	sf::Listener::setGlobalVolume(LimitVolume(volume));
 }
@@ -276,6 +282,22 @@ void AudioEngine::PauseSound(Audio& soundData)
 	}
 
 	m_AudioEventQueue.erase(*soundData.event);
+}
+
+void AudioEngine::UnpauseSound(uint8_t audioSourceID, Audio& soundData)
+{
+	if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+	{
+		(*music)->play();
+	}
+	else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
+	{
+		sound->play();
+	}
+
+	float stopTime = m_CurrentTime.asSeconds() + GetPlayingOffset(soundData.sound);
+
+	m_AudioEventQueue.emplace(audioSourceID, stopTime);
 }
 
 void AudioEngine::MuteSound(Audio& soundData)

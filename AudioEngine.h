@@ -13,6 +13,7 @@ class AudioClip;
 enum class AudioState
 {
 	Pause,
+	Unpause,
 	Mute,
 	Unmute,
 	Stop
@@ -96,6 +97,7 @@ private:
 	float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<sf::Music>>& soundVariant);
 
 	void PauseSound(Audio& soundData);
+	void UnpauseSound(uint8_t audioSourceID, Audio& soundData);
 	void MuteSound(Audio& soundData);
 	void UnmuteSound(Audio& soundData);
 	void StopSound(uint8_t audioSourceID, Audio& soundData);
