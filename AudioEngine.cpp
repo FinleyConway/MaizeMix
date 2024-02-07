@@ -6,15 +6,6 @@
 #include <cmath>
 #include <cassert>
 
-AudioEngine::AudioEngine()
-{
-	m_UnusedIDs.reserve(c_InvalidAudioSource);
-	for (uint8_t i = 1; i <= c_MaxAudioEmitters; i++)
-	{
-		m_UnusedIDs.push_back(i);
-	}
-}
-
 AudioClip AudioEngine::CreateClip(const std::string& audioPath, bool stream)
 {
 	static size_t id = 0;
@@ -438,10 +429,19 @@ uint8_t AudioEngine::PlayStreamedAudio(AudioClip& clip, float volume, float pitc
 
 uint8_t AudioEngine::GetNextID()
 {
-	if (m_UnusedIDs.empty()) return c_InvalidAudioSource;
+	static uint8_t newID = 1;
 
+	// generate a new ID if there is non have been returned
+	if (m_UnusedIDs.empty())
+	{
+		// prevent generating an ID greater then the max audio limitation
+		if (newID >= c_MaxAudioEmitters) return c_InvalidAudioSource;
+
+		return newID++;
+	}
+
+	// recycle an ID which was returned
 	uint8_t nextID = m_UnusedIDs.back();
-
 	m_UnusedIDs.pop_back();
 
 	return nextID;

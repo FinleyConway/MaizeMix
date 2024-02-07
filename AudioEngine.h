@@ -24,8 +24,6 @@ enum class AudioState
 class AudioEngine
 {
  public:
-	AudioEngine();
-
 	AudioClip CreateClip(const std::string& audioPath, bool stream);
 	void DestroyClip(AudioClip& clip);
 
@@ -114,7 +112,7 @@ private:
 
 	std::vector<uint8_t> m_UnusedIDs;
 
-	const uint8_t c_MaxAudioEmitters = 250;
-	const size_t c_InvalidClip = 0;
-	const uint8_t c_InvalidAudioSource = 0;
+	static constexpr const uint8_t c_MaxAudioEmitters = 250;
+	static constexpr const uint8_t c_InvalidClip = 0;
+	static constexpr const uint8_t c_InvalidAudioSource = 0;
 };
