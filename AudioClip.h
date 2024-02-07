@@ -18,13 +18,19 @@ class AudioClip
 	bool IsLoadInBackground() const { return m_IsStreaming; }
 	LoadState GetLoadState() const { return m_LoadState; }
 
-	bool operator==(const AudioClip& other) const;
+	bool operator==(const AudioClip& other) const { return other.m_ClipID == m_ClipID; }
 
  private:
 	friend class AudioEngine;
 
-	AudioClip(const std::string& filePath, size_t clipID, uint32_t channels, float duration, uint32_t frequency, bool stream, LoadState loadState);
-	AudioClip(size_t clipID, bool stream, LoadState loadState);
+	AudioClip(size_t clipID, uint32_t channels, float duration, uint32_t frequency, bool stream, AudioClip::LoadState loadState) :
+		m_ClipID(clipID), m_Channels(channels), m_Duration(duration), m_Frequency(frequency), m_IsStreaming(stream), m_LoadState(loadState)
+	{
+	}
+	AudioClip(size_t clipID, bool stream, AudioClip::LoadState loadState) :
+		m_ClipID(clipID), m_IsStreaming(stream), m_LoadState(loadState)
+	{
+	}
 
 	size_t m_ClipID = 0;
 	LoadState m_LoadState = LoadState::Unloaded;
@@ -33,7 +39,4 @@ class AudioClip
 	float m_Duration = 0;
 	uint32_t m_Frequency = 0;
 	bool m_IsStreaming = false;
-
-	size_t m_RefCounter = 0; // temp solution
-	std::string m_FilePath;
 };

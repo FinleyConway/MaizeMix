@@ -6,9 +6,11 @@
 #include <variant>
 #include <memory>
 #include <set>
-#include <iostream>
+
+#include "SoundReference.h"
 
 class AudioClip;
+class Music;
 
 enum class AudioState
 {
@@ -22,14 +24,7 @@ enum class AudioState
 class AudioEngine
 {
  public:
-	AudioEngine()
-	{
-		m_UnusedIDs.reserve(c_InvalidAudioSource);
-		for (uint8_t i = 1; i <= c_MaxAudioEmitters; i++)
-		{
-			m_UnusedIDs.push_back(i);
-		}
-	}
+	AudioEngine();
 
 	AudioClip CreateClip(const std::string& audioPath, bool stream);
 	void DestroyClip(AudioClip& clip);
@@ -75,13 +70,13 @@ class AudioEngine
 
     struct Audio
     {
-        std::variant<sf::Sound, std::shared_ptr<sf::Music>> sound;
+        std::variant<sf::Sound, std::shared_ptr<Music>> sound;
         const SoundEventData* event = nullptr;
 
         float previousVolume = 0;
 
         Audio() = default;
-        Audio(const std::shared_ptr<sf::Music>& audio, const SoundEventData* event)
+        Audio(const std::shared_ptr<Music>& audio, const SoundEventData* event)
 			: sound(audio), event(event)
 		{
 		}
@@ -94,7 +89,7 @@ class AudioEngine
 private:
 	float LimitVolume(float volume) const;
 	bool HasHitMaxAudioSources() const;
-	float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<sf::Music>>& soundVariant);
+	float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
 
 	void PauseSound(Audio& soundData);
 	void UnpauseSound(uint8_t audioSourceID, Audio& soundData);
@@ -102,30 +97,17 @@ private:
 	void UnmuteSound(Audio& soundData);
 	void StopSound(uint8_t audioSourceID, Audio& soundData);
 
-	uint8_t PlayAudio(const AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
+	uint8_t PlayAudio(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
 	uint8_t PlayStreamedAudio(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
 
-	uint8_t GetNextID()
-	{
-		if (m_UnusedIDs.empty()) return c_InvalidAudioSource;
-
-		uint8_t nextID = m_UnusedIDs.back();
-
-		m_UnusedIDs.pop_back();
-
-		return nextID;
-	}
-
-	void ReturnID(uint8_t audioSourceID)
-	{
-		m_UnusedIDs.push_back(audioSourceID);
-	}
+	uint8_t GetNextID();
+	void ReturnID(uint8_t audioSourceID);
 
  private:
 	sf::Time m_CurrentTime;
 
-	std::unordered_map<size_t, std::shared_ptr<sf::SoundBuffer>> m_SoundBuffers;
-	std::unordered_map<size_t, std::shared_ptr<sf::Music>> m_Music;
+	std::unordered_map<size_t, sf::SoundBuffer> m_SoundBuffers;
+	std::unordered_map<size_t, SoundReference> m_SoundReferences;
 
 	std::unordered_map<uint8_t, Audio> m_CurrentPlayingSounds;
  	std::set<SoundEventData> m_AudioEventQueue;

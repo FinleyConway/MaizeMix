@@ -1,9 +1,19 @@
 #include "AudioEngine.h"
 #include "AudioClip.h"
+#include "Music.h"
 
 #include <iostream>
 #include <cmath>
 #include <cassert>
+
+AudioEngine::AudioEngine()
+{
+	m_UnusedIDs.reserve(c_InvalidAudioSource);
+	for (uint8_t i = 1; i <= c_MaxAudioEmitters; i++)
+	{
+		m_UnusedIDs.push_back(i);
+	}
+}
 
 AudioClip AudioEngine::CreateClip(const std::string& audioPath, bool stream)
 {
@@ -12,32 +22,32 @@ AudioClip AudioEngine::CreateClip(const std::string& audioPath, bool stream)
 	// sfml boilerplate to create audio data
 	if (stream)
 	{
-		auto music = std::make_shared<sf::Music>();
+		SoundReference soundReference;
 
-		if (music->openFromFile(audioPath))
+		if (soundReference.OpenFromFile(audioPath))
 		{
 			id++;
 
-			m_Music.emplace(id, music);
+			m_SoundReferences.emplace(id, soundReference);
 
-			return { audioPath, id,music->getChannelCount(),
-					music->getDuration().asSeconds(),
-					music->getSampleRate(), stream, AudioClip::LoadState::Loaded};
+			return { id, soundReference.GetChannelCount(),
+					 soundReference.GetDuration().asSeconds(),
+					 soundReference.GetSampleRate(), stream, AudioClip::LoadState::Loaded};
 		}
 	}
 	else
 	{
-		auto buffer = std::make_shared<sf::SoundBuffer>();
+		sf::SoundBuffer soundBuffer;
 
-		if (buffer->loadFromFile(audioPath))
+		if (soundBuffer.loadFromFile(audioPath))
 		{
 			id++;
 
-			m_SoundBuffers.emplace(id, buffer);
+			m_SoundBuffers.emplace(id, soundBuffer);
 
-			return { audioPath, id,buffer->getChannelCount(),
-					buffer->getDuration().asSeconds(),
-					buffer->getSampleRate(), stream, AudioClip::LoadState::Loaded};
+			return { id,soundBuffer.getChannelCount(),
+					soundBuffer.getDuration().asSeconds(),
+					soundBuffer.getSampleRate(), stream, AudioClip::LoadState::Loaded};
 		}
 	}
 
@@ -50,7 +60,7 @@ void AudioEngine::DestroyClip(AudioClip& clip)
 	// remove clip
 	if (clip.m_IsStreaming)
 	{
-		m_Music.erase(clip.m_ClipID);
+		m_SoundReferences.erase(clip.m_ClipID);
 	}
 	else
 	{
@@ -106,9 +116,9 @@ void AudioEngine::UpdateSoundLoopState(uint8_t audioSourceID, bool loop)
 		auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
 
 		// update sound loop state
-		if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+		if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 		{
-			(*music)->setLoop(loop);
+			(*music)->SetLoop(loop);
 		}
 		else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 		{
@@ -132,9 +142,9 @@ void AudioEngine::UpdateSoundVolume(uint8_t audioSourceID, float volume)
 	{
 		auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
 
-		if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+		if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 		{
-			(*music)->setVolume(LimitVolume(volume));
+			(*music)->SetVolume(LimitVolume(volume));
 		}
 		else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 		{
@@ -149,9 +159,9 @@ void AudioEngine::UpdateSoundPitch(uint8_t audioSourceID, float pitch)
 	{
 		auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
 
-		if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+		if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 		{
-			(*music)->setPitch(pitch);
+			(*music)->SetPitch(pitch);
 		}
 		else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 		{
@@ -166,11 +176,11 @@ void AudioEngine::UpdateSoundPosition(uint8_t audioSourceID, float x, float y, f
 	{
 		auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
 
-		if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+		if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 		{
-			(*music)->setPosition(x, y, depth);
-			(*music)->setMinDistance(minDistance);
-			(*music)->setAttenuation(maxDistance);
+			(*music)->SetPosition(x, y, depth);
+			(*music)->SetMinDistance(minDistance);
+			(*music)->SetMaxDistance(maxDistance);
 		}
 		else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 		{
@@ -256,11 +266,11 @@ bool AudioEngine::HasHitMaxAudioSources() const
 	return false;
 }
 
-float AudioEngine::GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<sf::Music>>& soundVariant)
+float AudioEngine::GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant)
 {
-	if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundVariant))
+	if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundVariant))
 	{
-		return (*music)->getPlayingOffset().asSeconds();
+		return (*music)->GetPlayingOffset().asSeconds();
 	}
 	else if (auto* sound = std::get_if<sf::Sound>(&soundVariant))
 	{
@@ -272,9 +282,9 @@ float AudioEngine::GetPlayingOffset(const std::variant<sf::Sound, std::shared_pt
 
 void AudioEngine::PauseSound(Audio& soundData)
 {
-	if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+	if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 	{
-		(*music)->pause();
+		(*music)->Pause();
 	}
 	else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 	{
@@ -286,9 +296,9 @@ void AudioEngine::PauseSound(Audio& soundData)
 
 void AudioEngine::UnpauseSound(uint8_t audioSourceID, Audio& soundData)
 {
-	if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+	if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 	{
-		(*music)->play();
+		(*music)->Play();
 	}
 	else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 	{
@@ -302,10 +312,10 @@ void AudioEngine::UnpauseSound(uint8_t audioSourceID, Audio& soundData)
 
 void AudioEngine::MuteSound(Audio& soundData)
 {
-	if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+	if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 	{
-		soundData.previousVolume = (*music)->getVolume();
-		(*music)->setVolume(0);
+		soundData.previousVolume = (*music)->GetVolume();
+		(*music)->SetVolume(0);
 	}
 	else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 	{
@@ -316,9 +326,9 @@ void AudioEngine::MuteSound(Audio& soundData)
 
 void AudioEngine::UnmuteSound(Audio& soundData)
 {
-	if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+	if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 	{
-		(*music)->setVolume(soundData.previousVolume);
+		(*music)->SetVolume(soundData.previousVolume);
 	}
 	else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 	{
@@ -328,9 +338,9 @@ void AudioEngine::UnmuteSound(Audio& soundData)
 
 void AudioEngine::StopSound(uint8_t audioSourceID, Audio& soundData)
 {
-	if (auto* music = std::get_if<std::shared_ptr<sf::Music>>(&soundData.sound))
+	if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 	{
-		(*music)->stop();
+		(*music)->Stop();
 	}
 	else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 	{
@@ -345,14 +355,15 @@ void AudioEngine::StopSound(uint8_t audioSourceID, Audio& soundData)
 	ReturnID(audioSourceID);
 }
 
-uint8_t AudioEngine::PlayAudio(const AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance)
+uint8_t AudioEngine::PlayAudio(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance)
 {
-	const auto& buffer = m_SoundBuffers.at(clip.m_ClipID);
-
-	if (buffer != nullptr)
+	if (m_SoundBuffers.contains(clip.m_ClipID))
 	{
+		const auto& buffer = m_SoundBuffers.at(clip.m_ClipID);
+
+		// set source properties
 		sf::Sound sound;
-		sound.setBuffer(*buffer);
+		sound.setBuffer(buffer);
 		sound.setVolume(LimitVolume(volume));
 		sound.setPitch(pitch);
 		sound.setLoop(loop);
@@ -364,13 +375,17 @@ uint8_t AudioEngine::PlayAudio(const AudioClip& clip, float volume, float pitch,
 			sound.setAttenuation(maxDistance);
 		}
 
+		// get stop event time
 		float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds() + clip.GetDuration();
+
+		// get id
 		const uint8_t audioSourceID = GetNextID();
 
 		const auto& event = m_AudioEventQueue.emplace(audioSourceID, stopTime);
-
 		m_CurrentPlayingSounds.try_emplace(audioSourceID, sound, &(*event.first));
-		std::get_if<sf::Sound>(&m_CurrentPlayingSounds.at(audioSourceID).sound)->play();
+
+		// play the audio source
+		std::get<sf::Sound>(m_CurrentPlayingSounds.at(audioSourceID).sound).play();
 
 		return audioSourceID;
 	}
@@ -380,49 +395,59 @@ uint8_t AudioEngine::PlayAudio(const AudioClip& clip, float volume, float pitch,
 
 uint8_t AudioEngine::PlayStreamedAudio(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance)
 {
-	const auto& musicBuffer = m_Music.at(clip.m_ClipID);
-
-	if (musicBuffer != nullptr)
+	if (m_SoundReferences.contains(clip.m_ClipID))
 	{
-		std::shared_ptr<sf::Music> music;
+		const auto& musicBuffer = m_SoundReferences.at(clip.m_ClipID);
 
-		if (clip.m_RefCounter > 0)
+		// load music source
+		auto music = std::make_shared<Music>();
+		if (!music->Load(musicBuffer))
 		{
-			music = std::make_shared<sf::Music>();
-
-			if (!music->openFromFile(clip.m_FilePath))
-			{
-				return c_InvalidAudioSource;
-			}
-		}
-		else
-		{
-			music = musicBuffer;
+			return c_InvalidAudioSource;
 		}
 
-		clip.m_RefCounter++;
-
-		music->setVolume(LimitVolume(volume));
-		music->setPitch(pitch);
-		music->setLoop(loop);
+		// set source properties
+		music->SetVolume(LimitVolume(volume));
+		music->SetPitch(pitch);
+		music->SetLoop(loop);
 
 		if (x != 0.0f || y != 0.0f || depth != 0.0f)
 		{
-			music->setPosition(x, y, depth);
-			music->setMinDistance(minDistance);
-			music->setAttenuation(maxDistance);
+			music->SetPosition(x, y, depth);
+			music->SetMinDistance(minDistance);
+			music->SetMaxDistance(maxDistance);
 		}
 
+		// get stop event time
 		float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds() + clip.GetDuration();
+
+		// get id
 		uint8_t audioSourceID = GetNextID();
 
 		const auto& event = m_AudioEventQueue.emplace(audioSourceID, stopTime);
-
 		m_CurrentPlayingSounds.try_emplace(audioSourceID, music, &(*event.first));
-		(*std::get_if<std::shared_ptr<sf::Music>>(&m_CurrentPlayingSounds.at(audioSourceID).sound))->play();
+
+		// play the audio source
+		std::get<std::shared_ptr<Music>>(m_CurrentPlayingSounds.at(audioSourceID).sound)->Play();
 
 		return audioSourceID;
 	}
 
 	return c_InvalidAudioSource;
+}
+
+uint8_t AudioEngine::GetNextID()
+{
+	if (m_UnusedIDs.empty()) return c_InvalidAudioSource;
+
+	uint8_t nextID = m_UnusedIDs.back();
+
+	m_UnusedIDs.pop_back();
+
+	return nextID;
+}
+
+void AudioEngine::ReturnID(uint8_t audioSourceID)
+{
+	m_UnusedIDs.push_back(audioSourceID);
 }

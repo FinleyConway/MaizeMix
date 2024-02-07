@@ -13,6 +13,7 @@ int main()
     sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
 
     sf::Clock clock;
+	uint8_t id = 0;
 
     while (window.isOpen())
     {
@@ -28,36 +29,52 @@ int main()
 
         float deltaTime = clock.restart().asSeconds();
 
-		static bool spaceKeyPressed = false;
+		static bool pressed = false;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
 		{
-			if (!spaceKeyPressed)
+			if (pressed)
 			{
-				engine.PlaySound(sound, 30, 1, false);
-				spaceKeyPressed = true;
+				id = engine.PlaySound(sound, 100, 1, false);
+				pressed = false;
 			}
 		}
 		else
 		{
-			spaceKeyPressed = false;
+			pressed = true;
 		}
 
-		static bool spaceKeyPressed1 = false;
+		static bool pressed0 = false;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
 		{
-			if (!spaceKeyPressed1)
+			if (pressed0)
 			{
-				engine.PlaySound(music, 30, 1, false);
-				spaceKeyPressed1 = true;
+				engine.SetAudioState(id, AudioState::Stop);
+				pressed0 = false;
 			}
 		}
 		else
 		{
-			spaceKeyPressed1 = false;
+			pressed0 = true;
 		}
 
-        engine.Update(deltaTime);
+		static bool pressed1 = false;
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+		{
+			if (pressed1)
+			{
+				engine.DestroyClip(sound);
+				pressed1 = false;
+			}
+		}
+		else
+		{
+			pressed1 = true;
+		}
+
+
+		engine.Update(deltaTime);
     }
 }
