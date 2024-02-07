@@ -17,14 +17,14 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SFML)
 
 add_executable(AudioEngine
-        main.cpp
-        AudioClip.h
-        AudioEngine.cpp
-        AudioEngine.h
-        SoundReference.h
-        Music.h
-        Music.cpp
-        SoundReference.cpp
+        src/main.cpp
+        src/AudioEngine/AudioClip.h
+        src/AudioEngine/AudioEngine.cpp
+        src/AudioEngine/AudioEngine.h
+        src/AudioEngine/SoundReference.h
+        src/AudioEngine/Music.h
+        src/AudioEngine/Music.cpp
+        src/AudioEngine/SoundReference.cpp
 )
 
 # Link sfml

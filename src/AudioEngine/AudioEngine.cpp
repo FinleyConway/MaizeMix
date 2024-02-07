@@ -23,7 +23,7 @@ AudioClip AudioEngine::CreateClip(const std::string& audioPath, bool stream)
 
 			return { id, soundReference.GetChannelCount(),
 					 soundReference.GetDuration().asSeconds(),
-					 soundReference.GetSampleRate(), stream, AudioClip::LoadState::Loaded};
+					 soundReference.GetSampleRate(), stream, AudioClip::LoadState::Loaded };
 		}
 	}
 	else
@@ -36,9 +36,9 @@ AudioClip AudioEngine::CreateClip(const std::string& audioPath, bool stream)
 
 			m_SoundBuffers.emplace(id, soundBuffer);
 
-			return { id,soundBuffer.getChannelCount(),
-					soundBuffer.getDuration().asSeconds(),
-					soundBuffer.getSampleRate(), stream, AudioClip::LoadState::Loaded};
+			return { id, soundBuffer.getChannelCount(),
+					 soundBuffer.getDuration().asSeconds(),
+					 soundBuffer.getSampleRate(), stream, AudioClip::LoadState::Loaded };
 		}
 	}
 

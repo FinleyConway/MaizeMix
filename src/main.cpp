@@ -1,7 +1,8 @@
-#include <SFML/Window.hpp>
+#include "SFML/Window.hpp"
+#include <iostream>
 
-#include "AudioClip.h"
-#include "AudioEngine.h"
+#include "AudioEngine/AudioClip.h"
+#include "AudioEngine/AudioEngine.h"
 
 int main()
 {
@@ -14,6 +15,8 @@ int main()
 
     sf::Clock clock;
 	uint8_t id = 0;
+
+	std::cout << sizeof(engine) << std::endl;
 
     while (window.isOpen())
     {
@@ -35,7 +38,7 @@ int main()
 		{
 			if (pressed)
 			{
-				id = engine.PlaySound(sound, 100, 1, false);
+				std::cout << (int)engine.PlaySound(sound, 100, 1, false) << std::endl;
 				pressed = false;
 			}
 		}

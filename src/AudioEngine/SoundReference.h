@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFML/Audio.hpp>
+#include "SFML/Audio.hpp"
 #include <cstdint>
 #include <string>
 
@@ -18,7 +18,7 @@ class SoundReference
 	uint32_t GetChannelCount() const;
 	uint32_t GetSampleRate() const;
 
-  private:
+ private:
 	void AttachReference(Music* music) const;
 	void DetachReference(Music* music) const;
 

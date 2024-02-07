@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFML/Audio.hpp>
+#include "SFML/Audio.hpp"
 
 class SoundReference;
 
@@ -9,7 +9,7 @@ class Music : private sf::Music
  public:
 	Music() = default;
 	explicit Music(const SoundReference& soundReference);
- 	~Music();
+	~Music();
 
 	void Play();
 	void Pause();

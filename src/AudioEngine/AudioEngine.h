@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFML/Audio.hpp>
+#include "SFML/Audio.hpp"
 
 #include <unordered_map>
 #include <variant>
@@ -37,7 +37,7 @@ class AudioEngine
 
 	void SetAudioState(uint8_t audioSourceID, AudioState audioState);
 
-    void SetListenerPosition(float x, float y, float depth);
+	void SetListenerPosition(float x, float y, float depth);
 	void SetGlobalVolume(float volume);
 
 	void Update(float deltaTime);
@@ -66,25 +66,25 @@ class AudioEngine
 
 	};
 
-    struct Audio
-    {
-        std::variant<sf::Sound, std::shared_ptr<Music>> sound;
-        const SoundEventData* event = nullptr;
+	struct Audio
+	{
+		std::variant<sf::Sound, std::shared_ptr<Music>> sound;
+		const SoundEventData* event = nullptr;
 
-        float previousVolume = 0;
+		float previousVolume = 0;
 
-        Audio() = default;
-        Audio(const std::shared_ptr<Music>& audio, const SoundEventData* event)
+		Audio() = default;
+		Audio(const std::shared_ptr<Music>& audio, const SoundEventData* event)
 			: sound(audio), event(event)
 		{
 		}
-        Audio(const sf::Sound& audio, const SoundEventData* event)
-                : sound(audio), event(event)
-        {
-        }
-    };
+		Audio(const sf::Sound& audio, const SoundEventData* event)
+			: sound(audio), event(event)
+		{
+		}
+	};
 
-private:
+ private:
 	float LimitVolume(float volume) const;
 	bool HasHitMaxAudioSources() const;
 	float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
@@ -108,7 +108,7 @@ private:
 	std::unordered_map<size_t, SoundReference> m_SoundReferences;
 
 	std::unordered_map<uint8_t, Audio> m_CurrentPlayingSounds;
- 	std::set<SoundEventData> m_AudioEventQueue;
+	std::set<SoundEventData> m_AudioEventQueue;
 
 	std::vector<uint8_t> m_UnusedIDs;
 
