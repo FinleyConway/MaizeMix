@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(AudioEngine)
+project(MaizeMix)
 
 include(FetchContent)
 
@@ -16,19 +16,19 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SFML)
 
-add_executable(AudioEngine
+add_executable(MaizeMix
         src/main.cpp
-        src/AudioEngine/AudioClip.h
-        src/AudioEngine/AudioEngine.cpp
-        src/AudioEngine/AudioEngine.h
-        src/AudioEngine/SoundReference.h
-        src/AudioEngine/Music.h
-        src/AudioEngine/Music.cpp
-        src/AudioEngine/SoundReference.cpp
+        src/MaizeMix/AudioClip.h
+        src/MaizeMix/AudioEngine.cpp
+        src/MaizeMix/AudioEngine.h
+        src/MaizeMix/SoundReference.h
+        src/MaizeMix/Music.h
+        src/MaizeMix/Music.cpp
+        src/MaizeMix/SoundReference.cpp
 )
 
 # Link sfml
-target_link_libraries(AudioEngine
+target_link_libraries(MaizeMix
         PRIVATE
         sfml-graphics
         sfml-window

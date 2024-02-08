@@ -1,12 +1,14 @@
 #include "SFML/Window.hpp"
 #include <iostream>
 
-#include "AudioEngine/AudioClip.h"
-#include "AudioEngine/AudioEngine.h"
+#include "MaizeMix/AudioClip.h"
+#include "MaizeMix/AudioEngine.h"
+
+using namespace Maize;
 
 int main()
 {
-    AudioEngine engine;
+	Mix::AudioEngine engine;
 
 	auto sound = engine.CreateClip("TestAudio/Pew.wav", false);
 	auto music = engine.CreateClip("/home/finley/GameShiz/Sounds/TestMusic.wav", true);
@@ -53,7 +55,7 @@ int main()
 		{
 			if (pressed0)
 			{
-				engine.SetAudioState(id, AudioState::Stop);
+				engine.SetAudioState(id, Mix::AudioState::Stop);
 				pressed0 = false;
 			}
 		}
