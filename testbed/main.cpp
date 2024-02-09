@@ -1,8 +1,7 @@
-#include "SFML/Window.hpp"
 #include <iostream>
 
-#include "MaizeMix/AudioClip.h"
-#include "MaizeMix/AudioEngine.h"
+#include <SFML/Window.hpp>
+#include <MaizeMix.h>
 
 using namespace Maize;
 
@@ -10,29 +9,29 @@ int main()
 {
 	Mix::AudioEngine engine;
 
-	auto sound = engine.CreateClip("TestAudio/Pew.wav", false);
+	auto sound = engine.CreateClip("/home/finley/GameShiz/Sounds/Pew.wav", false);
 	auto music = engine.CreateClip("/home/finley/GameShiz/Sounds/TestMusic.wav", true);
 
-    sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
+	sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
 
-    sf::Clock clock;
+	sf::Clock clock;
 	uint8_t id = 0;
 
 	std::cout << sizeof(engine) << std::endl;
 
-    while (window.isOpen())
-    {
-        sf::Event e;
+	while (window.isOpen())
+	{
+		sf::Event e;
 
-        while (window.pollEvent(e))
-        {
-            if (e.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-        }
+		while (window.pollEvent(e))
+		{
+			if (e.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+		}
 
-        float deltaTime = clock.restart().asSeconds();
+		float deltaTime = clock.restart().asSeconds();
 
 		static bool pressed = false;
 
@@ -81,5 +80,5 @@ int main()
 
 
 		engine.Update(deltaTime);
-    }
+	}
 }
