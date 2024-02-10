@@ -102,7 +102,7 @@ namespace Maize::Mix {
 		}
 	}
 
-	void AudioEngine::UpdateSoundLoopState(uint8_t audioSourceID, bool loop)
+	void AudioEngine::UpdateAudioLoopState(uint8_t audioSourceID, bool loop)
 	{
 		if (m_CurrentPlayingSounds.contains(audioSourceID))
 		{
@@ -130,7 +130,7 @@ namespace Maize::Mix {
 		}
 	}
 
-	void AudioEngine::UpdateSoundVolume(uint8_t audioSourceID, float volume)
+	void AudioEngine::UpdateAudioVolume(uint8_t audioSourceID, float volume)
 	{
 		if (m_CurrentPlayingSounds.contains(audioSourceID))
 		{
@@ -147,7 +147,7 @@ namespace Maize::Mix {
 		}
 	}
 
-	void AudioEngine::UpdateSoundPitch(uint8_t audioSourceID, float pitch)
+	void AudioEngine::UpdateAudioPitch(uint8_t audioSourceID, float pitch)
 	{
 		if (m_CurrentPlayingSounds.contains(audioSourceID))
 		{
@@ -164,7 +164,7 @@ namespace Maize::Mix {
 		}
 	}
 
-	void AudioEngine::UpdateSoundPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance)
+	void AudioEngine::UpdateAudioPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance)
 	{
 		if (m_CurrentPlayingSounds.contains(audioSourceID))
 		{
@@ -439,7 +439,7 @@ namespace Maize::Mix {
 		// generate a new ID if there is non have been returned
 		if (m_UnusedIDs.empty())
 		{
-			// prevent generating an ID greater then the max audio limitation
+			// prevent generating an ID greater than the max audio limitation
 			if (newID >= c_MaxAudioEmitters) return c_InvalidAudioSource;
 
 			return newID++;

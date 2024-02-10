@@ -1,23 +1,32 @@
 #include <iostream>
 
 #include <SFML/Window.hpp>
+#include <entt/entt.hpp>
 #include <MaizeMix.h>
+
+#include "test_Components.h"
+#include "test_AudioSystem.h"
 
 using namespace Maize;
 
+uint8_t CreateTestDummy(entt::registry& registry, Mix::AudioEngine& engine)
+{
+	auto entity = registry.create();
+	auto& position = registry.emplace<PositionComponent>(entity);
+	auto& audio = registry.emplace<AudioSourceComponent>(entity);
+
+	audio.clip = engine.CreateClip("/home/finley/GameShiz/Sounds/Pew.wav", false);
+}
+
 int main()
 {
-	Mix::AudioEngine engine;
-
-	auto sound = engine.CreateClip("/home/finley/GameShiz/Sounds/Pew.wav", false);
-	auto music = engine.CreateClip("/home/finley/GameShiz/Sounds/TestMusic.wav", true);
-
 	sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
+	Mix::AudioEngine engine;
+	entt::registry registry;
 
 	sf::Clock clock;
-	uint8_t id = 0;
 
-	std::cout << sizeof(engine) << std::endl;
+	test_AudioSystem system;
 
 	while (window.isOpen())
 	{
@@ -33,52 +42,6 @@ int main()
 
 		float deltaTime = clock.restart().asSeconds();
 
-		static bool pressed = false;
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
-		{
-			if (pressed)
-			{
-				std::cout << (int)engine.PlaySound(sound, 100, 1, false) << std::endl;
-				pressed = false;
-			}
-		}
-		else
-		{
-			pressed = true;
-		}
-
-		static bool pressed0 = false;
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
-		{
-			if (pressed0)
-			{
-				engine.SetAudioState(id, Mix::AudioState::Stop);
-				pressed0 = false;
-			}
-		}
-		else
-		{
-			pressed0 = true;
-		}
-
-		static bool pressed1 = false;
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
-		{
-			if (pressed1)
-			{
-				engine.DestroyClip(sound);
-				pressed1 = false;
-			}
-		}
-		else
-		{
-			pressed1 = true;
-		}
-
-
-		engine.Update(deltaTime);
+		system.Update(deltaTime, registry);
 	}
 }

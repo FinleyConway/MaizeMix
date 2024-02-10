@@ -32,10 +32,10 @@ namespace Maize::Mix {
 		uint8_t PlaySound(AudioClip& clip, float volume, float pitch, bool loop);
 		uint8_t PlaySoundAtPosition(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
 
-		void UpdateSoundLoopState(uint8_t audioSourceID, bool loop);
-		void UpdateSoundVolume(uint8_t audioSourceID, float volume);
-		void UpdateSoundPitch(uint8_t audioSourceID, float pitch);
-		void UpdateSoundPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance);
+		void UpdateAudioLoopState(uint8_t audioSourceID, bool loop);
+		void UpdateAudioVolume(uint8_t audioSourceID, float volume);
+		void UpdateAudioPitch(uint8_t audioSourceID, float pitch);
+		void UpdateAudioPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance);
 
 		void SetAudioState(uint8_t audioSourceID, AudioState audioState);
 
