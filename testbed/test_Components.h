@@ -5,8 +5,9 @@
 namespace Maize {
 
 	struct PlayAudioSourceTag { };
+    struct PauseAudioSourceTag { };
 	struct StopAudioSourceTag { };
-	struct PlayingAudioSourceTag { uint8_t audioSourceID = 0; };
+	struct PlayingAudioSourceTag { const uint8_t audioSourceID = 0; };
 
 	struct PositionComponent
 	{

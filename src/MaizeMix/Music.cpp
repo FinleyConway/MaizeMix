@@ -113,4 +113,9 @@ namespace Maize::Mix {
 		}
 	}
 
+    sf::SoundSource::Status Music::GetStatus() const
+    {
+        return sf::Music::getStatus();
+    }
+
 }

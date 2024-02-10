@@ -14,30 +14,23 @@ namespace Maize::Mix {
 	class AudioClip;
 	class Music;
 
-	enum class AudioState
-	{
-		Pause,
-		Unpause,
-		Mute,
-		Unmute,
-		Stop
-	};
-
 	class AudioEngine
 	{
 	 public:
 		AudioClip CreateClip(const std::string& audioPath, bool stream);
 		void DestroyClip(AudioClip& clip);
 
-		uint8_t PlaySound(AudioClip& clip, float volume, float pitch, bool loop);
-		uint8_t PlaySoundAtPosition(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
+		uint8_t PlayAudio(AudioClip& clip, float volume, float pitch, bool loop);
+		uint8_t PlayAudioAtPosition(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
+        void PauseAudio(uint8_t audioSourceID);
+        void UnpauseAudio(uint8_t audioSourceID);
+        void StopAudio(uint8_t audioSourceID);
 
-		void UpdateAudioLoopState(uint8_t audioSourceID, bool loop);
-		void UpdateAudioVolume(uint8_t audioSourceID, float volume);
-		void UpdateAudioPitch(uint8_t audioSourceID, float pitch);
-		void UpdateAudioPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance);
-
-		void SetAudioState(uint8_t audioSourceID, AudioState audioState);
+        void SetAudioLoopState(uint8_t audioSourceID, bool loop);
+        void SetAudioMuteState(uint8_t audioSourceID, bool mute);
+		void SetAudioVolume(uint8_t audioSourceID, float volume);
+		void SetAudioPitch(uint8_t audioSourceID, float pitch);
+		void SetAudioPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance);
 
 		void SetListenerPosition(float x, float y, float depth);
 		void SetGlobalVolume(float volume);
@@ -91,14 +84,8 @@ namespace Maize::Mix {
 		bool HasHitMaxAudioSources() const;
 		float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
 
-		void PauseSound(Audio& soundData);
-		void UnpauseSound(uint8_t audioSourceID, Audio& soundData);
-		void MuteSound(Audio& soundData);
-		void UnmuteSound(Audio& soundData);
-		void StopSound(uint8_t audioSourceID, Audio& soundData);
-
-		uint8_t PlayAudio(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
-		uint8_t PlayStreamedAudio(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
+		uint8_t PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
+		uint8_t PlayStreamedAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
 
 		uint8_t GetNextID();
 		void ReturnID(uint8_t audioSourceID);

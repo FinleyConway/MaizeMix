@@ -30,6 +30,7 @@ namespace Maize::Mix {
 		float GetVolume() const;
 		bool GetLoop() const;
 		sf::Time GetPlayingOffset() const;
+        sf::SoundSource::Status GetStatus() const;
 
 		void ResetReference();
 
