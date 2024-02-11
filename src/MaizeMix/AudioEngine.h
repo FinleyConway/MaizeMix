@@ -13,6 +13,7 @@ namespace Maize::Mix {
 
 	class AudioClip;
 	class Music;
+	class AudioFinishCallback;
 
 	class AudioEngine
 	{
@@ -35,6 +36,8 @@ namespace Maize::Mix {
 		void SetListenerPosition(float x, float y, float depth);
 		void SetGlobalVolume(float volume);
 
+		void SetAudioFinishCallback(AudioFinishCallback* callback);
+
 		void Update(float deltaTime);
 
 	 private:
@@ -44,8 +47,8 @@ namespace Maize::Mix {
 			const float stopTime = 0;
 
 			SoundEventData() = default;
-			SoundEventData(int16_t clip, float stopTime)
-				: stopTime(stopTime), audioSourceID(clip)
+			SoundEventData(uint8_t audioSourceID, float stopTime)
+				: audioSourceID(audioSourceID), stopTime(stopTime)
 			{
 			}
 
@@ -65,7 +68,6 @@ namespace Maize::Mix {
 		{
 			std::variant<sf::Sound, std::shared_ptr<Music>> sound;
 			const SoundEventData* event = nullptr;
-
 			float previousVolume = 0;
 
 			Audio() = default;
@@ -84,8 +86,8 @@ namespace Maize::Mix {
 		bool HasHitMaxAudioSources() const;
 		float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
 
-		uint8_t PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
-		uint8_t PlayStreamedAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 5.0f, float maxDistance = 10.0f);
+		uint8_t PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 0.0f, float maxDistance= 0.0f);
+		uint8_t PlayStreamedAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 0.0f, float maxDistance = 0.0f);
 
 		uint8_t GetNextID();
 		void ReturnID(uint8_t audioSourceID);
@@ -100,6 +102,8 @@ namespace Maize::Mix {
 		std::set<SoundEventData> m_AudioEventQueue;
 
 		std::vector<uint8_t> m_UnusedIDs;
+
+		AudioFinishCallback* m_Callback = nullptr;
 
 		static constexpr const uint8_t c_MaxAudioEmitters = 250;
 		static constexpr const uint8_t c_InvalidClip = 0;

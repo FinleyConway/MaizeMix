@@ -1,6 +1,7 @@
 #include "AudioEngine.h"
 #include "AudioClip.h"
 #include "Music.h"
+#include "AudioFinishCallback.h"
 
 #include <iostream>
 #include <cmath>
@@ -79,7 +80,7 @@ namespace Maize::Mix {
 		}
 		else
 		{
-			return PlayAudio(clip, volume, pitch, loop);
+			return PlayAudioClip(clip, volume, pitch, loop);
 		}
 	}
 
@@ -289,6 +290,11 @@ namespace Maize::Mix {
         sf::Listener::setGlobalVolume(LimitVolume(volume));
     }
 
+	void AudioEngine::SetAudioFinishCallback(AudioFinishCallback* callback)
+	{
+		m_Callback = callback;
+	}
+
 	void AudioEngine::Update(float deltaTime)
 	{
 		// update audio system time
@@ -298,6 +304,11 @@ namespace Maize::Mix {
 		while (!m_AudioEventQueue.empty() && m_CurrentTime.asSeconds() >= m_AudioEventQueue.begin()->stopTime)
 		{
 			auto audioSourceID = m_AudioEventQueue.begin()->audioSourceID;
+
+			if (m_Callback != nullptr)
+			{
+				m_Callback->OnAudioFinish(audioSourceID);
+			}
 
 			m_CurrentPlayingSounds.erase(audioSourceID);
 			m_AudioEventQueue.erase(m_AudioEventQueue.begin());
@@ -357,8 +368,7 @@ namespace Maize::Mix {
 			}
 
 			// get stop event time
-			float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds()
-																			 + clip.GetDuration();
+			float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds() + clip.GetDuration();
 
 			// get id
 			const uint8_t audioSourceID = GetNextID();
@@ -401,8 +411,7 @@ namespace Maize::Mix {
 			}
 
 			// get stop event time
-			float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds()
-																			 + clip.GetDuration();
+			float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds() + clip.GetDuration();
 
 			// get id
 			uint8_t audioSourceID = GetNextID();

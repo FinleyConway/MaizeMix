@@ -18,6 +18,7 @@ add_library(MaizeMix
         MaizeMix/Music.h
         MaizeMix/Music.cpp
         MaizeMix.h
+        MaizeMix/AudioFinishCallback.h
 )
 
 # Link sfml
