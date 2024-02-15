@@ -15,6 +15,7 @@ add_executable(testbed
         test_AudioSystem.cpp
         test_AudioSystem.h
         test_Components.h
+        test_Callback.h
 )
 
 target_include_directories(testbed PRIVATE ${CMAKE_SOURCE_DIR}/src)

@@ -1,13 +1,15 @@
 #pragma once
 
-#include <cstdint>
+#include "AudioSource.h"
 
 namespace Maize::Mix {
+
+	class AudioSource;
 
 	class AudioFinishCallback
 	{
 	 public:
-		virtual void OnAudioFinish(uint8_t audioSourceID) = 0;
+		virtual void OnAudioFinish(const AudioSource& audioSource) = 0;
 	};
 
-} // Maize
+} // Maize::Mix

@@ -12,6 +12,8 @@
 namespace Maize::Mix {
 
 	class AudioClip;
+	class AudioSourceDef;
+	class AudioSource;
 	class Music;
 	class AudioFinishCallback;
 
@@ -21,17 +23,13 @@ namespace Maize::Mix {
 		AudioClip CreateClip(const std::string& audioPath, bool stream);
 		void DestroyClip(AudioClip& clip);
 
-		uint8_t PlayAudio(AudioClip& clip, float volume, float pitch, bool loop);
-		uint8_t PlayAudioAtPosition(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
+		size_t CreateAudioSource(const AudioSourceDef& audioSourceDef);
+		void DestroyAudioSource(size_t audioSourceID);
+
+		void PlayAudio(size_t audioSourceID, float x = 0, float y = 0, float z = 0);
         void PauseAudio(uint8_t audioSourceID);
         void UnpauseAudio(uint8_t audioSourceID);
         void StopAudio(uint8_t audioSourceID);
-
-        void SetAudioLoopState(uint8_t audioSourceID, bool loop);
-        void SetAudioMuteState(uint8_t audioSourceID, bool mute);
-		void SetAudioVolume(uint8_t audioSourceID, float volume);
-		void SetAudioPitch(uint8_t audioSourceID, float pitch);
-		void SetAudioPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance);
 
 		void SetListenerPosition(float x, float y, float depth);
 		void SetGlobalVolume(float volume);
@@ -43,20 +41,17 @@ namespace Maize::Mix {
 	 private:
 		struct SoundEventData
 		{
-			const uint8_t audioSourceID = 0;
+			const size_t playingID = 0;
 			const float stopTime = 0;
 
 			SoundEventData() = default;
-			SoundEventData(uint8_t audioSourceID, float stopTime)
-				: audioSourceID(audioSourceID), stopTime(stopTime)
-			{
-			}
+			SoundEventData(size_t audioSourceID, float stopTime) : playingID(audioSourceID), stopTime(stopTime) { }
 
 			bool operator<(const SoundEventData& other) const
 			{
 				if (stopTime == other.stopTime)
 				{
-					return audioSourceID < other.audioSourceID;
+					return playingID < other.playingID;
 				}
 
 				return stopTime < other.stopTime;
@@ -67,18 +62,11 @@ namespace Maize::Mix {
 		struct Audio
 		{
 			std::variant<sf::Sound, std::shared_ptr<Music>> sound;
-			const SoundEventData* event = nullptr;
 			float previousVolume = 0;
 
 			Audio() = default;
-			Audio(const std::shared_ptr<Music>& audio, const SoundEventData* event)
-				: sound(audio), event(event)
-			{
-			}
-			Audio(const sf::Sound& audio, const SoundEventData* event)
-				: sound(audio), event(event)
-			{
-			}
+			explicit Audio(const std::shared_ptr<Music>& audio) : sound(audio) { }
+			explicit Audio(const sf::Sound& audio) : sound(audio) { }
 		};
 
 	 private:
@@ -86,17 +74,19 @@ namespace Maize::Mix {
 		bool HasHitMaxAudioSources() const;
 		float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
 
-		uint8_t PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 0.0f, float maxDistance= 0.0f);
-		uint8_t PlayStreamedAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x = 0.0f, float y = 0.0f, float depth = 0.0f, float minDistance = 0.0f, float maxDistance = 0.0f);
+		uint8_t PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
+		uint8_t PlayStreamedAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance);
 
 		uint8_t GetNextID();
-		void ReturnID(uint8_t audioSourceID);
+		void ReturnID(uint8_t playingID);
 
 	 private:
 		sf::Time m_CurrentTime;
 
 		std::unordered_map<size_t, sf::SoundBuffer> m_SoundBuffers;
 		std::unordered_map<size_t, SoundReference> m_SoundReferences;
+
+		std::unordered_map<size_t, AudioSource> m_AudioSources;
 
 		std::unordered_map<uint8_t, Audio> m_CurrentPlayingSounds;
 		std::set<SoundEventData> m_AudioEventQueue;
@@ -105,9 +95,9 @@ namespace Maize::Mix {
 
 		AudioFinishCallback* m_Callback = nullptr;
 
-		static constexpr const uint8_t c_MaxAudioEmitters = 250;
-		static constexpr const uint8_t c_InvalidClip = 0;
-		static constexpr const uint8_t c_InvalidAudioSource = 0;
+		static constexpr uint8_t c_MaxAudioEmitters = 250;
+		static constexpr uint8_t c_InvalidClip = 0;
+		static constexpr uint8_t c_InvalidAudioSource = 0;
 	};
 
 }
