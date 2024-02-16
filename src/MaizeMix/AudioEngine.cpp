@@ -259,6 +259,18 @@ namespace Maize::Mix {
 		}
 	}
 
+	float AudioEngine::GetAudioOffsetTime(uint8_t playingID)
+	{
+		if (m_CurrentPlayingAudio.contains(playingID))
+		{
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
+
+			return GetPlayingOffset(soundData.sound);
+		}
+
+		return 0;
+	}
+
 	void AudioEngine::SetListenerPosition(float x, float y, float depth)
 	{
 		if (m_CurrentPlayingAudio.empty()) return;

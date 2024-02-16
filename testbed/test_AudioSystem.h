@@ -43,6 +43,8 @@ namespace Maize {
                 {
                     engine.SetAudioPosition(playing.playingID, position.x, position.y, 0, audio.minDistance, audio.maxDistance);
                 }
+
+				audio.time = engine.GetAudioOffsetTime(playing.playingID);
             }
         }
 

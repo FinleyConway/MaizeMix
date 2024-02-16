@@ -33,6 +33,8 @@ namespace Maize::Mix {
 		void SetAudioPitch(uint8_t playingID, float pitch);
 		void SetAudioPosition(uint8_t playingID, float x, float y, float depth, float minDistance, float maxDistance);
 
+		float GetAudioOffsetTime(uint8_t playingID);
+
 		void SetListenerPosition(float x, float y, float depth);
 		void SetGlobalVolume(float volume);
 
@@ -106,9 +108,9 @@ namespace Maize::Mix {
 
 		AudioFinishCallback* m_Callback = nullptr;
 
-		static constexpr const uint8_t c_MaxAudioEmitters = 250;
-		static constexpr const uint8_t c_InvalidClip = 0;
-		static constexpr const uint8_t c_InvalidAudioSource = 0;
+		static constexpr uint8_t c_MaxAudioEmitters = 250;
+		static constexpr uint8_t c_InvalidClip = 0;
+		static constexpr uint8_t c_InvalidAudioSource = 0;
 	};
 
 }
