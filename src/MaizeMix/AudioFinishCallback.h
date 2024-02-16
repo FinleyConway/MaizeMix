@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstdint>
+#include <any>
+
 namespace Maize::Mix {
 
 	class AudioFinishCallback

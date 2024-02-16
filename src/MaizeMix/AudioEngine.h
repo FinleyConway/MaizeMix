@@ -23,15 +23,15 @@ namespace Maize::Mix {
 		void DestroyClip(AudioClip& clip);
 
 		uint8_t PlayAudio(AudioClip& clip, float volume, float pitch, bool loop, const std::any& userData, float x = 0, float y = 0, float depth = 0, float minDistance = 0, float maxDistance = 0);
-		void PauseAudio(uint8_t audioSourceID);
-		void UnpauseAudio(uint8_t audioSourceID);
-		void StopAudio(uint8_t audioSourceID);
+		void PauseAudio(uint8_t playingID);
+		void UnpauseAudio(uint8_t playingID);
+		void StopAudio(uint8_t playingID);
 
-		void SetAudioLoopState(uint8_t audioSourceID, bool loop);
-		void SetAudioMuteState(uint8_t audioSourceID, bool mute);
-		void SetAudioVolume(uint8_t audioSourceID, float volume);
-		void SetAudioPitch(uint8_t audioSourceID, float pitch);
-		void SetAudioPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance);
+		void SetAudioLoopState(uint8_t playingID, bool loop);
+		void SetAudioMuteState(uint8_t playingID, bool mute);
+		void SetAudioVolume(uint8_t playingID, float volume);
+		void SetAudioPitch(uint8_t playingID, float pitch);
+		void SetAudioPosition(uint8_t playingID, float x, float y, float depth, float minDistance, float maxDistance);
 
 		void SetListenerPosition(float x, float y, float depth);
 		void SetGlobalVolume(float volume);
@@ -43,12 +43,12 @@ namespace Maize::Mix {
 	 private:
 		struct SoundEventData
 		{
-			const uint8_t audioSourceID = 0;
+			const uint8_t playingID = 0;
 			const float stopTime = 0;
 
 			SoundEventData() = default;
-			SoundEventData(uint8_t audioSourceID, float stopTime)
-				: audioSourceID(audioSourceID), stopTime(stopTime)
+			SoundEventData(uint8_t playingID, float stopTime)
+				: playingID(playingID), stopTime(stopTime)
 			{
 			}
 
@@ -56,7 +56,7 @@ namespace Maize::Mix {
 			{
 				if (stopTime == other.stopTime)
 				{
-					return audioSourceID < other.audioSourceID;
+					return playingID < other.playingID;
 				}
 
 				return stopTime < other.stopTime;
@@ -99,7 +99,7 @@ namespace Maize::Mix {
 		std::unordered_map<size_t, sf::SoundBuffer> m_SoundBuffers;
 		std::unordered_map<size_t, SoundReference> m_SoundReferences;
 
-		std::unordered_map<uint8_t, Audio> m_CurrentPlayingSounds;
+		std::unordered_map<uint8_t, Audio> m_CurrentPlayingAudio;
 		std::set<SoundEventData> m_AudioEventQueue;
 
 		std::vector<uint8_t> m_UnusedIDs;

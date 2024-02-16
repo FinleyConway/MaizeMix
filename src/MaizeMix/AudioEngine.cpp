@@ -84,11 +84,11 @@ namespace Maize::Mix {
 		}
 	}
 
-	void AudioEngine::PauseAudio(uint8_t audioSourceID)
+	void AudioEngine::PauseAudio(uint8_t playingID)
 	{
-		if (m_CurrentPlayingSounds.contains(audioSourceID))
+		if (m_CurrentPlayingAudio.contains(playingID))
 		{
-			auto &soundData = m_CurrentPlayingSounds.at(audioSourceID);
+			auto &soundData = m_CurrentPlayingAudio.at(playingID);
 
 			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 			{
@@ -106,11 +106,11 @@ namespace Maize::Mix {
 		}
 	}
 
-	void AudioEngine::UnpauseAudio(uint8_t audioSourceID)
+	void AudioEngine::UnpauseAudio(uint8_t playingID)
 	{
-		if (m_CurrentPlayingSounds.contains(audioSourceID))
+		if (m_CurrentPlayingAudio.contains(playingID))
 		{
-			auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
 
 			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 			{
@@ -125,15 +125,15 @@ namespace Maize::Mix {
 
 			float stopTime = m_CurrentTime.asSeconds() + GetPlayingOffset(soundData.sound);
 
-			m_AudioEventQueue.emplace(audioSourceID, stopTime);
+			m_AudioEventQueue.emplace(playingID, stopTime);
 		}
 	}
 
-	void AudioEngine::StopAudio(uint8_t audioSourceID)
+	void AudioEngine::StopAudio(uint8_t playingID)
 	{
-		if (m_CurrentPlayingSounds.contains(audioSourceID))
+		if (m_CurrentPlayingAudio.contains(playingID))
 		{
-			auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
 
 			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 			{
@@ -146,18 +146,20 @@ namespace Maize::Mix {
 
 			assert(soundData.event != nullptr);
 
-			m_AudioEventQueue.erase(*soundData.event);
-			m_CurrentPlayingSounds.erase(audioSourceID);
+			m_Callback->OnAudioFinish(playingID, soundData.userData);
 
-			ReturnID(audioSourceID);
+			m_AudioEventQueue.erase(*soundData.event);
+			m_CurrentPlayingAudio.erase(playingID);
+
+			ReturnID(playingID);
 		}
 	}
 
-	void AudioEngine::SetAudioLoopState(uint8_t audioSourceID, bool loop)
+	void AudioEngine::SetAudioLoopState(uint8_t playingID, bool loop)
 	{
-		if (m_CurrentPlayingSounds.contains(audioSourceID))
+		if (m_CurrentPlayingAudio.contains(playingID))
 		{
-			auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
 
 			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 			{
@@ -177,15 +179,15 @@ namespace Maize::Mix {
 			// recreate sound event with new event time
 			float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds() + GetPlayingOffset(soundData.sound);
 
-			m_AudioEventQueue.emplace(audioSourceID, stopTime);
+			m_AudioEventQueue.emplace(playingID, stopTime);
 		}
 	}
 
-	void AudioEngine::SetAudioMuteState(uint8_t audioSourceID, bool mute)
+	void AudioEngine::SetAudioMuteState(uint8_t playingID, bool mute)
 	{
-		if (m_CurrentPlayingSounds.contains(audioSourceID))
+		if (m_CurrentPlayingAudio.contains(playingID))
 		{
-			auto &soundData = m_CurrentPlayingSounds.at(audioSourceID);
+			auto &soundData = m_CurrentPlayingAudio.at(playingID);
 
 			float volume = mute ? 0.0f : soundData.previousVolume;
 
@@ -202,11 +204,11 @@ namespace Maize::Mix {
 		}
 	}
 
-	void AudioEngine::SetAudioVolume(uint8_t audioSourceID, float volume)
+	void AudioEngine::SetAudioVolume(uint8_t playingID, float volume)
 	{
-		if (m_CurrentPlayingSounds.contains(audioSourceID))
+		if (m_CurrentPlayingAudio.contains(playingID))
 		{
-			auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
 
 			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 			{
@@ -219,11 +221,11 @@ namespace Maize::Mix {
 		}
 	}
 
-	void AudioEngine::SetAudioPitch(uint8_t audioSourceID, float pitch)
+	void AudioEngine::SetAudioPitch(uint8_t playingID, float pitch)
 	{
-		if (m_CurrentPlayingSounds.contains(audioSourceID))
+		if (m_CurrentPlayingAudio.contains(playingID))
 		{
-			auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
 
 			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 			{
@@ -236,11 +238,11 @@ namespace Maize::Mix {
 		}
 	}
 
-	void AudioEngine::SetAudioPosition(uint8_t audioSourceID, float x, float y, float depth, float minDistance, float maxDistance)
+	void AudioEngine::SetAudioPosition(uint8_t playingID, float x, float y, float depth, float minDistance, float maxDistance)
 	{
-		if (m_CurrentPlayingSounds.contains(audioSourceID))
+		if (m_CurrentPlayingAudio.contains(playingID))
 		{
-			auto& soundData = m_CurrentPlayingSounds.at(audioSourceID);
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
 
 			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 			{
@@ -259,14 +261,14 @@ namespace Maize::Mix {
 
 	void AudioEngine::SetListenerPosition(float x, float y, float depth)
 	{
-		if (m_CurrentPlayingSounds.empty()) return;
+		if (m_CurrentPlayingAudio.empty()) return;
 
 		sf::Listener::setPosition(x, y, depth);
 	}
 
 	void AudioEngine::SetGlobalVolume(float volume)
 	{
-		if (m_CurrentPlayingSounds.empty()) return;
+		if (m_CurrentPlayingAudio.empty()) return;
 
 		sf::Listener::setGlobalVolume(LimitVolume(volume));
 	}
@@ -284,14 +286,14 @@ namespace Maize::Mix {
 		// remove all finished sounds
 		while (!m_AudioEventQueue.empty() && m_CurrentTime.asSeconds() >= m_AudioEventQueue.begin()->stopTime)
 		{
-			auto audioSourceID = m_AudioEventQueue.begin()->audioSourceID;
+			auto audioSourceID = m_AudioEventQueue.begin()->playingID;
 
 			if (m_Callback != nullptr)
 			{
-				m_Callback->OnAudioFinish(audioSourceID, m_CurrentPlayingSounds.at(audioSourceID).userData);
+				m_Callback->OnAudioFinish(audioSourceID, m_CurrentPlayingAudio.at(audioSourceID).userData);
 			}
 
-			m_CurrentPlayingSounds.erase(audioSourceID);
+			m_CurrentPlayingAudio.erase(audioSourceID);
 			m_AudioEventQueue.erase(m_AudioEventQueue.begin());
 
 			ReturnID(audioSourceID);
@@ -355,10 +357,10 @@ namespace Maize::Mix {
 			const uint8_t audioSourceID = GetNextID();
 
 			const auto& event = m_AudioEventQueue.emplace(audioSourceID, stopTime);
-			m_CurrentPlayingSounds.try_emplace(audioSourceID, sound, &(*event.first), userData);
+			m_CurrentPlayingAudio.try_emplace(audioSourceID, sound, &(*event.first), userData);
 
 			// play the audio source
-			std::get<sf::Sound>(m_CurrentPlayingSounds.at(audioSourceID).sound).play();
+			std::get<sf::Sound>(m_CurrentPlayingAudio.at(audioSourceID).sound).play();
 
 			return audioSourceID;
 		}
@@ -398,10 +400,10 @@ namespace Maize::Mix {
 			uint8_t audioSourceID = GetNextID();
 
 			const auto& event = m_AudioEventQueue.emplace(audioSourceID, stopTime);
-			m_CurrentPlayingSounds.try_emplace(audioSourceID, music, &(*event.first), userData);
+			m_CurrentPlayingAudio.try_emplace(audioSourceID, music, &(*event.first), userData);
 
 			// play the audio source
-			std::get<std::shared_ptr<Music>>(m_CurrentPlayingSounds.at(audioSourceID).sound)->Play();
+			std::get<std::shared_ptr<Music>>(m_CurrentPlayingAudio.at(audioSourceID).sound)->Play();
 
 			return audioSourceID;
 		}

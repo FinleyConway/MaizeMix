@@ -9,6 +9,7 @@ namespace Maize {
 
     /*
      * TODO:
+     * Pause needs fixing
      * Switch between 2d and 3d sounds (make sounds relative to listener)
      */
 
@@ -17,12 +18,6 @@ namespace Maize {
 	 public:
 		void Update(float deltaTime, entt::registry& reg, Mix::AudioEngine& engine)
 		{
-			auto view = reg.view<PlayingAudioSourceTag>();
-			for (auto [entity, playing] : view.each())
-			{
-				printf("?\n");
-			}
-
 			engine.Update(deltaTime);
 
             SetAudioAttributes(reg, engine);
@@ -37,16 +32,16 @@ namespace Maize {
         void SetAudioAttributes(entt::registry& reg, Mix::AudioEngine& engine)
         {
             auto view = reg.view<PositionComponent, AudioSourceComponent, PlayingAudioSourceTag>();
-            for (auto [entity, position, audio, playingID] : view.each())
+            for (auto [entity, position, audio, playing] : view.each())
             {
-                engine.SetAudioLoopState(playingID.audioSourceID, audio.loop);
-                engine.SetAudioMuteState(playingID.audioSourceID, audio.mute);
-                engine.SetAudioPitch(playingID.audioSourceID, audio.pitch);
-                engine.SetAudioVolume(playingID.audioSourceID, audio.volume);
+                engine.SetAudioLoopState(playing.playingID, audio.loop);
+                engine.SetAudioMuteState(playing.playingID, audio.mute);
+                engine.SetAudioPitch(playing.playingID, audio.pitch);
+                engine.SetAudioVolume(playing.playingID, audio.volume);
 
                 if (audio.spatialize)
                 {
-                    engine.SetAudioPosition(playingID.audioSourceID, position.x, position.y, 0, audio.minDistance, audio.maxDistance);
+                    engine.SetAudioPosition(playing.playingID, position.x, position.y, 0, audio.minDistance, audio.maxDistance);
                 }
             }
         }
@@ -56,9 +51,18 @@ namespace Maize {
 			auto view = reg.view<PositionComponent, AudioSourceComponent, PlayAudioSourceTag>();
 			for (auto [entity, position, audio] : view.each())
 			{
+				auto userData = entity;
+
+				// stop current playing audio
+				if (reg.all_of<PlayingAudioSourceTag>(entity))
+				{
+					auto& playing = reg.get<PlayingAudioSourceTag>(entity);
+
+					engine.StopAudio(playing.playingID);
+				}
+
 				if (audio.spatialize)
 				{
-					auto userData = entity;
 					auto id = engine.PlayAudio(audio.clip, audio.volume, audio.pitch, audio.loop, userData,
                                                                 position.x, position.y, 0.0f, audio.minDistance,
                                                                 audio.maxDistance);
@@ -68,7 +72,6 @@ namespace Maize {
 				}
 				else
 				{
-					auto userData = entity;
 					auto id = engine.PlayAudio(audio.clip, audio.volume, audio.pitch, audio.loop, userData);
 
 					reg.emplace_or_replace<PlayingAudioSourceTag>(entity, id);
@@ -80,18 +83,18 @@ namespace Maize {
         void PauseAudio(entt::registry& reg, Mix::AudioEngine& engine)
         {
             auto view = reg.view<AudioSourceComponent, PlayingAudioSourceTag, PauseAudioSourceTag>();
-            for (auto [entity, audio, playingID] : view.each())
+            for (auto [entity, audio, playing] : view.each())
             {
-                engine.PauseAudio(playingID.audioSourceID);
+                engine.PauseAudio(playing.playingID);
             }
         }
 
         void UnpauseAudio(entt::registry& reg, Mix::AudioEngine& engine)
         {
             auto view = reg.view<AudioSourceComponent, PlayingAudioSourceTag, PauseAudioSourceTag, PlayAudioSourceTag>();
-            for (auto [entity, audio, playingID] : view.each())
+            for (auto [entity, audio, playing] : view.each())
             {
-                engine.UnpauseAudio(playingID.audioSourceID);
+                engine.UnpauseAudio(playing.playingID);
 
                 reg.remove<PauseAudioSourceTag>(entity);
                 reg.remove<PlayAudioSourceTag>(entity);
@@ -101,11 +104,10 @@ namespace Maize {
 		void StopAudio(entt::registry& reg, Mix::AudioEngine& engine)
 		{
 			auto view = reg.view<AudioSourceComponent, PlayingAudioSourceTag, StopAudioSourceTag>();
-			for (auto [entity, audio, playingID] : view.each())
+			for (auto [entity, audio, playing] : view.each())
 			{
-				engine.StopAudio(playingID.audioSourceID);
+				engine.StopAudio(playing.playingID);
 
-				reg.remove<PlayingAudioSourceTag>(entity);
 				reg.remove<StopAudioSourceTag>(entity);
 			}
 		}

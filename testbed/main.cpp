@@ -35,7 +35,7 @@ int main()
 
 	test_AudioSystem system;
 
-	auto clip = engine.CreateClip("/home/finley/GameShiz/Sounds/Pew.wav", false);
+	auto clip = engine.CreateClip("/home/finley/GameShiz/Sounds/TestMusic.wav", true);
 
 	auto entity = CreateTestDummy(registry, clip);
 
@@ -54,8 +54,10 @@ int main()
 		float deltaTime = clock.restart().asSeconds();
 
 		static bool pressed = false;
+		static bool pressed1 = false;
+		static bool pressed2 = false;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
 		{
 			if (!pressed)
 			{
@@ -66,6 +68,32 @@ int main()
 		else
 		{
 			pressed = false;
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+		{
+			if (!pressed1)
+			{
+				registry.emplace<StopAudioSourceTag>(entity);
+				pressed1 = true;
+			}
+		}
+		else
+		{
+			pressed1 = false;
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+		{
+			if (!pressed2)
+			{
+				registry.emplace<PauseAudioSourceTag>(entity);
+				pressed2 = true;
+			}
+		}
+		else
+		{
+			pressed2 = false;
 		}
 
 		system.Update(deltaTime, registry, engine);
