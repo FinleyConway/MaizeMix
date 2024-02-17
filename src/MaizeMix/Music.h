@@ -25,6 +25,7 @@ namespace Maize::Mix {
 		void SetPosition(float x, float y, float depth);
 		void SetMinDistance(float distance);
 		void SetMaxDistance(float distance);
+		void SetPlayback(float seconds);
 
 		const SoundReference* GetReference() const;
 		float GetVolume() const;

@@ -82,6 +82,11 @@ namespace Maize::Mix {
 		sf::Music::setAttenuation(distance);
 	}
 
+	void Music::SetPlayback(float seconds)
+	{
+		sf::Music::setPlayingOffset(sf::seconds(seconds));
+	}
+
 	const SoundReference* Music::GetReference() const
 	{
 		return m_Reference;

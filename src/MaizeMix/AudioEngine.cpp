@@ -259,6 +259,23 @@ namespace Maize::Mix {
 		}
 	}
 
+	void AudioEngine::SetAudioPlayback(uint8_t playingID, float seconds)
+	{
+		if (m_CurrentPlayingAudio.contains(playingID))
+		{
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
+
+			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
+			{
+				(*music)->SetPlayback(seconds);
+			}
+			else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
+			{
+				sound->setPlayingOffset(sf::seconds((seconds)));
+			}
+		}
+	}
+
 	float AudioEngine::GetAudioOffsetTime(uint8_t playingID)
 	{
 		if (m_CurrentPlayingAudio.contains(playingID))
