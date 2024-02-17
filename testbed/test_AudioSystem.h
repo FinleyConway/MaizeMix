@@ -9,7 +9,7 @@ namespace Maize {
 
     /*
      * TODO:
-     * Pause needs fixing
+	 * find solution to prevent unnecessary adding of components
      * Switch between 2d and 3d sounds (make sounds relative to listener)
      */
 
@@ -45,6 +45,8 @@ namespace Maize {
                 }
 
 				audio.time = engine.GetAudioOffsetTime(playing.playingID);
+
+				printf("%1.5f\n", audio.time);
             }
         }
 
@@ -93,13 +95,13 @@ namespace Maize {
 
         void UnpauseAudio(entt::registry& reg, Mix::AudioEngine& engine)
         {
-            auto view = reg.view<AudioSourceComponent, PlayingAudioSourceTag, PauseAudioSourceTag, PlayAudioSourceTag>();
+            auto view = reg.view<AudioSourceComponent, PlayingAudioSourceTag, PauseAudioSourceTag, UnPauseAudioSourceTag>();
             for (auto [entity, audio, playing] : view.each())
             {
                 engine.UnpauseAudio(playing.playingID);
 
                 reg.remove<PauseAudioSourceTag>(entity);
-                reg.remove<PlayAudioSourceTag>(entity);
+                reg.remove<UnPauseAudioSourceTag>(entity);
             }
         }
 

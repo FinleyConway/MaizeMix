@@ -56,12 +56,13 @@ int main()
 		static bool pressed = false;
 		static bool pressed1 = false;
 		static bool pressed2 = false;
+		static bool pressed3 = false;
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
 		{
 			if (!pressed)
 			{
-				registry.emplace<PlayAudioSourceTag>(entity);
+				registry.emplace_or_replace<PlayAudioSourceTag>(entity);
 				pressed = true;
 			}
 		}
@@ -74,7 +75,7 @@ int main()
 		{
 			if (!pressed1)
 			{
-				registry.emplace<StopAudioSourceTag>(entity);
+				registry.emplace_or_replace<StopAudioSourceTag>(entity);
 				pressed1 = true;
 			}
 		}
@@ -87,13 +88,26 @@ int main()
 		{
 			if (!pressed2)
 			{
-				registry.emplace<PauseAudioSourceTag>(entity);
+				registry.emplace_or_replace<PauseAudioSourceTag>(entity);
 				pressed2 = true;
 			}
 		}
 		else
 		{
 			pressed2 = false;
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4))
+		{
+			if (!pressed3)
+			{
+				registry.emplace_or_replace<UnPauseAudioSourceTag>(entity);
+				pressed3 = true;
+			}
+		}
+		else
+		{
+			pressed3 = false;
 		}
 
 		system.Update(deltaTime, registry, engine);
