@@ -39,6 +39,7 @@ namespace Maize {
                 engine.SetAudioPitch(playing.playingID, audio.pitch);
                 engine.SetAudioVolume(playing.playingID, audio.volume);
 
+				engine.SetSpatializationMode(playing.playingID, audio.spatialize);
                 if (audio.spatialize)
                 {
                     engine.SetAudioPosition(playing.playingID, position.x, position.y, 0, audio.minDistance, audio.maxDistance);

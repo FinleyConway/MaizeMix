@@ -33,6 +33,7 @@ namespace Maize::Mix {
 		void SetAudioPitch(uint8_t playingID, float pitch);
 		void SetAudioPosition(uint8_t playingID, float x, float y, float depth, float minDistance, float maxDistance);
 		void SetAudioPlayback(uint8_t playingID, float seconds);
+		void SetSpatializationMode(uint8_t playingID, bool isSpatialization);
 
 		float GetAudioOffsetTime(uint8_t playingID);
 

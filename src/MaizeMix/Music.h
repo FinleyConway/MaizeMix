@@ -26,12 +26,14 @@ namespace Maize::Mix {
 		void SetMinDistance(float distance);
 		void SetMaxDistance(float distance);
 		void SetPlayback(float seconds);
+		void SetRelativeToListener(bool relative);
 
 		const SoundReference* GetReference() const;
 		float GetVolume() const;
 		bool GetLoop() const;
 		sf::Time GetPlayingOffset() const;
         sf::SoundSource::Status GetStatus() const;
+		bool IsRelativeToListener() const;
 
 		void ResetReference();
 

@@ -246,12 +246,18 @@ namespace Maize::Mix {
 
 			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 			{
+				// sounds should always be at position 0 so it acts as 2D
+				if ((*music)->IsRelativeToListener()) return;
+
 				(*music)->SetPosition(x, y, depth);
 				(*music)->SetMinDistance(minDistance);
 				(*music)->SetMaxDistance(maxDistance);
 			}
 			else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 			{
+				// sounds should always be at position 0 so it acts as 2D
+				if (sound->isRelativeToListener()) return;
+
 				sound->setPosition(x, y, depth);
 				sound->setMinDistance(minDistance);
 				sound->setAttenuation(maxDistance);
@@ -272,6 +278,39 @@ namespace Maize::Mix {
 			else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 			{
 				sound->setPlayingOffset(sf::seconds((seconds)));
+			}
+		}
+	}
+
+	void AudioEngine::SetSpatializationMode(uint8_t playingID, bool isSpatialization)
+	{
+		if (m_CurrentPlayingAudio.contains(playingID))
+		{
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
+
+			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
+			{
+				if (isSpatialization)
+				{
+					(*music)->SetRelativeToListener(false);
+				}
+				else
+				{
+					(*music)->SetRelativeToListener(true);
+					(*music)->SetPosition(0, 0, 0);
+				}
+			}
+			else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
+			{
+				if (isSpatialization)
+				{
+					sound->setRelativeToListener(false);
+				}
+				else
+				{
+					sound->setRelativeToListener(true);
+					sound->setPosition(0, 0, 0);
+				}
 			}
 		}
 	}

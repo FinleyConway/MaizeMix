@@ -87,6 +87,11 @@ namespace Maize::Mix {
 		sf::Music::setPlayingOffset(sf::seconds(seconds));
 	}
 
+	void Music::SetRelativeToListener(bool relative)
+	{
+		sf::Music::setRelativeToListener(relative);
+	}
+
 	const SoundReference* Music::GetReference() const
 	{
 		return m_Reference;
@@ -107,6 +112,16 @@ namespace Maize::Mix {
 		return sf::Music::getPlayingOffset();
 	}
 
+	sf::SoundSource::Status Music::GetStatus() const
+	{
+		return sf::Music::getStatus();
+	}
+
+	bool Music::IsRelativeToListener() const
+	{
+		return sf::Music::isRelativeToListener();
+	}
+
 	void Music::ResetReference()
 	{
 		sf::Music::stop();
@@ -117,10 +132,5 @@ namespace Maize::Mix {
 			m_Reference = nullptr;
 		}
 	}
-
-    sf::SoundSource::Status Music::GetStatus() const
-    {
-        return sf::Music::getStatus();
-    }
 
 }
