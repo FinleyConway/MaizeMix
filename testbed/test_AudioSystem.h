@@ -1,17 +1,13 @@
 #pragma once
 
+#include <iostream>
+
 #include "entt/entt.hpp"
 #include "MaizeMix.h"
 
 #include "test_Components.h"
 
 namespace Maize {
-
-    /*
-     * TODO:
-	 * find solution to prevent unnecessary adding of components
-     * Switch between 2d and 3d sounds (make sounds relative to listener)
-     */
 
 	class test_AudioSystem
 	{
@@ -20,100 +16,109 @@ namespace Maize {
 		{
 			engine.Update(deltaTime);
 
-            SetAudioAttributes(reg, engine);
-
-			PlayAudio(reg, engine);
-            PauseAudio(reg, engine);
-            UnpauseAudio(reg, engine);
-			StopAudio(reg, engine);
-		}
-
-	 private:
-        void SetAudioAttributes(entt::registry& reg, Mix::AudioEngine& engine)
-        {
-            auto view = reg.view<PositionComponent, AudioSourceComponent, PlayingAudioSourceTag>();
-            for (auto [entity, position, audio, playing] : view.each())
-            {
-                engine.SetAudioLoopState(playing.playingID, audio.loop);
-                engine.SetAudioMuteState(playing.playingID, audio.mute);
-                engine.SetAudioPitch(playing.playingID, audio.pitch);
-                engine.SetAudioVolume(playing.playingID, audio.volume);
-
-				engine.SetSpatializationMode(playing.playingID, audio.spatialize);
-                if (audio.spatialize)
-                {
-                    engine.SetAudioPosition(playing.playingID, position.x, position.y, 0, audio.minDistance, audio.maxDistance);
-                }
-
-				audio.time = engine.GetAudioOffsetTime(playing.playingID);
-
-				printf("%1.5f\n", audio.time);
-            }
-        }
-
-		void PlayAudio(entt::registry& reg, Mix::AudioEngine& engine)
-		{
-			auto view = reg.view<PositionComponent, AudioSourceComponent, PlayAudioSourceTag>();
+			auto view = reg.view<PositionComponent, AudioSourceComponent>();
 			for (auto [entity, position, audio] : view.each())
 			{
-				auto userData = entity;
+				// audio source tagged to be played
+				if (reg.all_of<PlayAudioSourceTag>(entity))
+				{
+					PlayAudio(reg, entity, engine);
+				}
 
-				// stop current playing audio
+				// if the audio is playing
 				if (reg.all_of<PlayingAudioSourceTag>(entity))
 				{
 					auto& playing = reg.get<PlayingAudioSourceTag>(entity);
 
-					engine.StopAudio(playing.playingID);
-				}
+					SetAudioAttributes(reg, entity, engine);
 
-				if (audio.spatialize)
-				{
-					auto id = engine.PlayAudio(audio.clip, audio.volume, audio.pitch, audio.loop, userData,
-                                                                position.x, position.y, 0.0f, audio.minDistance,
-                                                                audio.maxDistance);
+					if (reg.all_of<StopAudioSourceTag>(entity))
+					{
+						engine.StopAudio(playing.playingID);
 
-					reg.emplace_or_replace<PlayingAudioSourceTag>(entity, id);
-					reg.remove<PlayAudioSourceTag>(entity);
+						reg.remove<StopAudioSourceTag>(entity);
+
+						continue;
+					}
+
+					if (reg.all_of<PauseAudioSourceTag>(entity))
+					{
+						engine.PauseAudio(playing.playingID);
+
+						reg.remove<PauseAudioSourceTag>(entity);
+					}
+
+					if (reg.all_of<UnPauseAudioSourceTag>(entity))
+					{
+						engine.UnpauseAudio(playing.playingID);
+
+						reg.remove<UnPauseAudioSourceTag>(entity);
+					}
 				}
 				else
 				{
-					auto id = engine.PlayAudio(audio.clip, audio.volume, audio.pitch, audio.loop, userData);
-
-					reg.emplace_or_replace<PlayingAudioSourceTag>(entity, id);
-					reg.remove<PlayAudioSourceTag>(entity);
+					// remove any added audio based components if the audio source is not playing
+					reg.remove<PauseAudioSourceTag>(entity);
+					reg.remove<UnPauseAudioSourceTag>(entity);
+					reg.remove<StopAudioSourceTag>(entity);
 				}
 			}
+
 		}
 
-        void PauseAudio(entt::registry& reg, Mix::AudioEngine& engine)
+	 private:
+        void SetAudioAttributes(entt::registry& reg, entt::entity entity, Mix::AudioEngine& engine)
         {
-            auto view = reg.view<AudioSourceComponent, PlayingAudioSourceTag, PauseAudioSourceTag>();
-            for (auto [entity, audio, playing] : view.each())
-            {
-                engine.PauseAudio(playing.playingID);
-            }
-        }
+			const auto& position = reg.get<PositionComponent>(entity);
+			auto& audio = reg.get<AudioSourceComponent>(entity);
+			auto& playing = reg.get<PlayingAudioSourceTag>(entity);
 
-        void UnpauseAudio(entt::registry& reg, Mix::AudioEngine& engine)
-        {
-            auto view = reg.view<AudioSourceComponent, PlayingAudioSourceTag, PauseAudioSourceTag, UnPauseAudioSourceTag>();
-            for (auto [entity, audio, playing] : view.each())
-            {
-                engine.UnpauseAudio(playing.playingID);
+			engine.SetAudioLoopState(playing.playingID, audio.loop);
+			engine.SetAudioMuteState(playing.playingID, audio.mute);
+			engine.SetAudioPitch(playing.playingID, audio.pitch);
+			engine.SetAudioVolume(playing.playingID, audio.volume);
 
-                reg.remove<PauseAudioSourceTag>(entity);
-                reg.remove<UnPauseAudioSourceTag>(entity);
-            }
-        }
-
-		void StopAudio(entt::registry& reg, Mix::AudioEngine& engine)
-		{
-			auto view = reg.view<AudioSourceComponent, PlayingAudioSourceTag, StopAudioSourceTag>();
-			for (auto [entity, audio, playing] : view.each())
+			engine.SetSpatializationMode(playing.playingID, audio.spatialize);
+			if (audio.spatialize)
 			{
-				engine.StopAudio(playing.playingID);
+				engine.SetAudioPosition(playing.playingID, position.x, position.y, 0, audio.minDistance, audio.maxDistance);
+			}
 
-				reg.remove<StopAudioSourceTag>(entity);
+			audio.time = engine.GetAudioOffsetTime(playing.playingID);
+        }
+
+		void PlayAudio(entt::registry& reg, entt::entity entity, Mix::AudioEngine& engine)
+		{
+			const auto& position = reg.get<PositionComponent>(entity);
+			auto& audio = reg.get<AudioSourceComponent>(entity);
+
+			auto userData = entity;
+
+			// stop current playing audio its playing
+			if (reg.all_of<PlayingAudioSourceTag>(entity))
+			{
+				auto& playing = reg.get<PlayingAudioSourceTag>(entity);
+
+				engine.StopAudio(playing.playingID);
+			}
+
+			reg.remove<PauseAudioSourceTag>(entity);
+
+			if (audio.spatialize)
+			{
+				auto id = engine.PlayAudio(audio.clip, audio.volume, audio.pitch, audio.loop, userData,
+					position.x, position.y, 0.0f, audio.minDistance,
+					audio.maxDistance);
+
+				reg.emplace_or_replace<PlayingAudioSourceTag>(entity, id);
+				reg.remove<PlayAudioSourceTag>(entity);
+			}
+			else
+			{
+				auto id = engine.PlayAudio(audio.clip, audio.volume, audio.pitch, audio.loop, userData);
+
+				reg.emplace_or_replace<PlayingAudioSourceTag>(entity, id);
+				reg.remove<PlayAudioSourceTag>(entity);
 			}
 		}
 	};
