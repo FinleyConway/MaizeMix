@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-namespace Maize::Mix {
+namespace Mix {
 
 	class Music;
 
@@ -35,4 +35,4 @@ namespace Maize::Mix {
 		mutable std::set<Music*> m_References;
 	};
 
-}
+} // Mix

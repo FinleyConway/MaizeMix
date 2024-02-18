@@ -1,14 +1,10 @@
-#include <iostream>
-
 #include <SFML/Window.hpp>
 #include <entt/entt.hpp>
-#include <MaizeMix.h>
+#include <MaizeMix/MaizeMix.h>
 
 #include "test_Components.h"
 #include "test_AudioSystem.h"
 #include "test_Callback.h"
-
-using namespace Maize;
 
 auto CreateTestDummy(entt::registry& registry, const Mix::AudioClip& clip)
 {

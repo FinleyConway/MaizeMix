@@ -1,25 +1,21 @@
 #pragma once
 
-#include "MaizeMix.h"
+#include "MaizeMix/MaizeMix.h"
 #include "test_Components.h"
 #include "entt/entt.hpp"
 
-namespace Maize {
+class test_Callback : public Mix::AudioFinishCallback
+{
+ public:
+	explicit test_Callback(entt::registry& registry) : m_Reg(&registry) { }
 
-	class test_Callback : public Mix::AudioFinishCallback
+	void OnAudioFinish(uint8_t audioSourceID, const std::any& userData) override
 	{
-	 public:
-		explicit test_Callback(entt::registry& registry) : m_Reg(&registry) { }
+		auto entity = std::any_cast<entt::entity>(userData);
 
-		void OnAudioFinish(uint8_t audioSourceID, const std::any& userData) override
-		{
-			auto entity = std::any_cast<entt::entity>(userData);
+		m_Reg->remove<PlayingAudioSourceTag>(entity);
+	}
 
-			m_Reg->remove<PlayingAudioSourceTag>(entity);
-		}
-
-	 private:
-		entt::registry* m_Reg = nullptr;
-	};
-
-}
+ private:
+	entt::registry* m_Reg = nullptr;
+};

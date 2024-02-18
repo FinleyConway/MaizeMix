@@ -1,7 +1,7 @@
 #include "Music.h"
 #include "SoundReference.h"
 
-namespace Maize::Mix {
+namespace Mix {
 
 	Music::Music(const SoundReference& soundReference)
 	{
@@ -138,4 +138,4 @@ namespace Maize::Mix {
 		}
 	}
 
-}
+} // Mix

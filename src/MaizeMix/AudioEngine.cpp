@@ -7,7 +7,7 @@
 #include <cmath>
 #include <cassert>
 
-namespace Maize::Mix {
+namespace Mix {
 
 	AudioClip AudioEngine::CreateClip(const std::string& audioPath, bool stream)
 	{
@@ -521,4 +521,4 @@ namespace Maize::Mix {
 		m_UnusedIDs.push_back(audioSourceID);
 	}
 
-}
+} // Mix

@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <any>
 
-namespace Maize::Mix {
+namespace Mix {
 
 	class AudioFinishCallback
 	{
@@ -11,4 +11,4 @@ namespace Maize::Mix {
 		virtual void OnAudioFinish(uint8_t audioSourceID, const std::any& userData) = 0;
 	};
 
-} // Maize::Mix
+} // Mix

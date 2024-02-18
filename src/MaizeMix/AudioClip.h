@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdint>
 
-namespace Maize::Mix {
+namespace Mix {
 
 	class AudioClip
 	{
@@ -65,4 +65,4 @@ namespace Maize::Mix {
 		bool m_IsStreaming = false;
 	};
 
-}
+} // Mix

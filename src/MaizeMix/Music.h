@@ -2,7 +2,7 @@
 
 #include <SFML/Audio.hpp>
 
-namespace Maize::Mix {
+namespace Mix {
 
 	class SoundReference;
 
@@ -42,4 +42,4 @@ namespace Maize::Mix {
 		const SoundReference* m_Reference = nullptr;
 	};
 
-}
+} // Mix

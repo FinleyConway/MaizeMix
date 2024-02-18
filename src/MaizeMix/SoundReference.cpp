@@ -1,7 +1,7 @@
 #include "SoundReference.h"
 #include "Music.h"
 
-namespace Maize::Mix {
+namespace Mix {
 
 	SoundReference::~SoundReference()
 	{
@@ -57,4 +57,4 @@ namespace Maize::Mix {
 		m_References.erase(music);
 	}
 
-}
+} // Mix

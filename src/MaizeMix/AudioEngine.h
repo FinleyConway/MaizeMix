@@ -10,7 +10,7 @@
 
 #include "SoundReference.h"
 
-namespace Maize::Mix {
+namespace Mix {
 
 	class AudioClip;
 	class Music;
@@ -116,4 +116,4 @@ namespace Maize::Mix {
 		static constexpr uint8_t c_InvalidAudioSource = 0;
 	};
 
-}
+} // Mix
