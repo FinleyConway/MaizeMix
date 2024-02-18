@@ -17,15 +17,15 @@ else()
 endif()
 
 add_library(MaizeMix ${LIB_TYPE}
-        AudioClip.h
-        AudioEngine.cpp
-        AudioEngine.h
-        SoundReference.h
-        SoundReference.cpp
-        Music.h
-        Music.cpp
+        Audio/AudioClip.h
+        Engine/AudioEngine.cpp
+        Engine/AudioEngine.h
+        Audio/SoundReference.h
+        Audio/SoundReference.cpp
+        Audio/Music.h
+        Audio/Music.cpp
         MaizeMix.h
-        AudioFinishCallback.h
+        Engine/AudioFinishCallback.h
 )
 
 # Link sfml

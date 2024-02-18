@@ -1,5 +1,5 @@
 #pragma once
 
-#include "AudioEngine.h"
-#include "AudioFinishCallback.h"
-#include "AudioClip.h"
+#include "MaizeMix/Engine/AudioEngine.h"
+#include "MaizeMix/Engine/AudioFinishCallback.h"
+#include "MaizeMix/Audio/AudioClip.h"

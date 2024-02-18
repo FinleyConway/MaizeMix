@@ -1,6 +1,6 @@
 #include "AudioEngine.h"
-#include "AudioClip.h"
-#include "Music.h"
+#include "../Audio/AudioClip.h"
+#include "../Audio/Music.h"
 #include "AudioFinishCallback.h"
 
 #include <iostream>

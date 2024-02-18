@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFML/Audio.hpp>
+#include "SFML/Audio.hpp"
 
 #include <unordered_map>
 #include <variant>
@@ -8,7 +8,7 @@
 #include <any>
 #include <set>
 
-#include "SoundReference.h"
+#include "../Audio/SoundReference.h"
 
 namespace Mix {
 
