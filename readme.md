@@ -1,6 +1,6 @@
 # MaizeMix
 
-`MaizeMix` is an audio engine designed to streamline audio handling within your application using, using the capabilities of the [SFML](https://github.com/SFML/SFML) audio library module. The design of `MaizeMix` is primarily focused on supporting an Entity-Component-System (ECS) architecture, offering a modular and scalable approach to audio management.
+`MaizeMix` is an audio engine designed to streamline audio handling within your application, using the capabilities of the [SFML](https://github.com/SFML/SFML) audio library module. The design of `MaizeMix` is primarily focused on supporting an Entity-Component-System (ECS) architecture, offering a modular and scalable approach to audio management.
 
 ## Code Example
 
