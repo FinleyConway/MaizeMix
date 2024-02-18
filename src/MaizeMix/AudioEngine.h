@@ -90,6 +90,7 @@ namespace Maize::Mix {
 		float LimitVolume(float volume) const;
 		bool HasHitMaxAudioSources() const;
 		float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
+		float GetDuration(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
 
 		uint8_t PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance, const std::any& userData);
 		uint8_t PlayStreamedAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance, const std::any& userData);

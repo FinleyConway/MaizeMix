@@ -123,7 +123,8 @@ namespace Maize::Mix {
 				sound->play();
 			}
 
-			float stopTime = m_CurrentTime.asSeconds() + GetPlayingOffset(soundData.sound);
+			float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
+			float stopTime = m_CurrentTime.asSeconds() + playingTimeLeft;
 
 			m_AudioEventQueue.emplace(playingID, stopTime);
 		}
@@ -177,7 +178,8 @@ namespace Maize::Mix {
 			m_AudioEventQueue.erase(*soundData.event);
 
 			// recreate sound event with new event time
-			float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds() + GetPlayingOffset(soundData.sound);
+			float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
+			float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds() + playingTimeLeft;
 
 			m_AudioEventQueue.emplace(playingID, stopTime);
 		}
@@ -358,7 +360,8 @@ namespace Maize::Mix {
 
 			if (m_Callback != nullptr)
 			{
-				m_Callback->OnAudioFinish(audioSourceID, m_CurrentPlayingAudio.at(audioSourceID).userData);
+				if (m_CurrentPlayingAudio.contains(audioSourceID))
+					m_Callback->OnAudioFinish(audioSourceID, m_CurrentPlayingAudio.at(audioSourceID).userData);
 			}
 
 			m_CurrentPlayingAudio.erase(audioSourceID);
@@ -393,6 +396,20 @@ namespace Maize::Mix {
 		else if (auto* sound = std::get_if<sf::Sound>(&soundVariant))
 		{
 			return sound->getPlayingOffset().asSeconds();
+		}
+
+		return 0.0f;
+	}
+
+	float AudioEngine::GetDuration(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant)
+	{
+		if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundVariant))
+		{
+			return (*music)->GetDuration().asSeconds();
+		}
+		else if (auto* sound = std::get_if<sf::Sound>(&soundVariant))
+		{
+			return sound->getBuffer()->getDuration().asSeconds();
 		}
 
 		return 0.0f;

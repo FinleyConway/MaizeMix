@@ -32,6 +32,7 @@ namespace Maize::Mix {
 		float GetVolume() const;
 		bool GetLoop() const;
 		sf::Time GetPlayingOffset() const;
+		sf::Time GetDuration() const;
         sf::SoundSource::Status GetStatus() const;
 		bool IsRelativeToListener() const;
 

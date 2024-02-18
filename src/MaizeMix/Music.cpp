@@ -112,6 +112,11 @@ namespace Maize::Mix {
 		return sf::Music::getPlayingOffset();
 	}
 
+	sf::Time Music::GetDuration() const
+	{
+		return sf::Music::getDuration();
+	}
+
 	sf::SoundSource::Status Music::GetStatus() const
 	{
 		return sf::Music::getStatus();
