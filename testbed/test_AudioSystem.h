@@ -100,6 +100,8 @@ class test_AudioSystem
 
 		reg.remove<PauseAudioSourceTag>(entity);
 
+		audio.time = 0;
+
 		if (audio.spatialize)
 		{
 			auto id = engine.PlayAudio(audio.clip, audio.volume, audio.pitch, audio.loop, userData,
