@@ -2,6 +2,32 @@
 
 `MaizeMix` is an audio engine designed to streamline audio handling within your application, using the capabilities of the [SFML](https://github.com/SFML/SFML) audio library module. The design of `MaizeMix` is primarily focused on supporting an Entity-Component-System (ECS) architecture, offering a modular and scalable approach to audio management.
 
+## Features
+
+### AudioEngine
+- Handles the audio state and attributes 
+	- Audio clip management
+	- Play, Pause, UnPause and Stop Audio
+	- Alter the functionality of the playing audio
+	- Spatialization 
+	- Callbacks for finished audio
+	- Audio listener position
+	- Audio listener volume (global volume change)
+	- Easy ECS integration 
+
+### AudioClip
+- Information about the imported audio clip
+	- Number of channels
+	- Duration of clip
+	- Sample rate of the clip
+	- stream audio clip / load clip into memory
+	- Audio Samples (wip)
+
+### AudioMixer (wip)
+- Mix audio and apply effects to them
+
+### Audio Recording (wip)
+
 ## Code Example
 
 ```cpp
