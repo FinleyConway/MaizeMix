@@ -34,6 +34,7 @@ namespace Mix {
 		void SetAudioPosition(uint8_t playingID, float x, float y, float depth, float minDistance, float maxDistance);
 		void SetAudioPlayback(uint8_t playingID, float seconds);
 		void SetSpatializationMode(uint8_t playingID, bool isSpatialization);
+        void SetAudioOffsetTime(uint8_t playingID, float time);
 
 		float GetAudioOffsetTime(uint8_t playingID);
 
@@ -74,6 +75,7 @@ namespace Mix {
 			const SoundEventData* event = nullptr;
 			const std::any userData;
 			float previousVolume = 0;
+            float previousTimeOffset = 0;
 
 			Audio() = default;
 			Audio(const std::shared_ptr<Music>& audio, const SoundEventData* event, const std::any& userData)

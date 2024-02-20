@@ -275,7 +275,7 @@ namespace Mix {
 
 			if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
 			{
-				(*music)->SetPlayback(seconds);
+                (*music)->SetPlaybackOffset(seconds);
 			}
 			else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
 			{
@@ -317,17 +317,55 @@ namespace Mix {
 		}
 	}
 
-	float AudioEngine::GetAudioOffsetTime(uint8_t playingID)
-	{
-		if (m_CurrentPlayingAudio.contains(playingID))
-		{
-			auto& soundData = m_CurrentPlayingAudio.at(playingID);
+    void AudioEngine::SetAudioOffsetTime(uint8_t playingID, float time)
+    {
+        if (m_CurrentPlayingAudio.contains(playingID))
+        {
+            auto& soundData = m_CurrentPlayingAudio.at(playingID);
 
-			return GetPlayingOffset(soundData.sound);
-		}
+            // don't need to update the position if they are "equal"
+            if (std::abs(time - soundData.previousTimeOffset) < std::numeric_limits<float>::epsilon()) return;
 
-		return 0;
-	}
+            bool loop = false;
+
+            if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundData.sound))
+            {
+                (*music)->SetPlaybackOffset(time);
+                loop = (*music)->GetLoop();
+            }
+            else if (auto* sound = std::get_if<sf::Sound>(&soundData.sound))
+            {
+                sound->setPlayingOffset(sf::seconds(time));
+                loop = sound->getLoop();
+            }
+
+            // remove current sound event
+            assert(soundData.event != nullptr);
+            m_AudioEventQueue.erase(*soundData.event);
+
+            // recreate sound event with new event time
+            float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
+            float stopTime = loop ? std::numeric_limits<float>::infinity() : m_CurrentTime.asSeconds() + playingTimeLeft;
+
+            m_AudioEventQueue.emplace(playingID, stopTime);
+        }
+    }
+
+    float AudioEngine::GetAudioOffsetTime(uint8_t playingID)
+    {
+        if (m_CurrentPlayingAudio.contains(playingID))
+        {
+            auto& soundData = m_CurrentPlayingAudio.at(playingID);
+
+            float offset = GetPlayingOffset(soundData.sound);
+
+            soundData.previousTimeOffset = offset;
+
+            return offset;
+        }
+
+        return 0;
+    }
 
 	void AudioEngine::SetListenerPosition(float x, float y, float depth)
 	{

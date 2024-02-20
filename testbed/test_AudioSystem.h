@@ -72,6 +72,7 @@ class test_AudioSystem
 		engine.SetAudioMuteState(playing.playingID, audio.mute);
 		engine.SetAudioPitch(playing.playingID, audio.pitch);
 		engine.SetAudioVolume(playing.playingID, audio.volume);
+        engine.SetAudioOffsetTime(playing.playingID, audio.time);
 
 		engine.SetSpatializationMode(playing.playingID, audio.spatialize);
 		if (audio.spatialize)

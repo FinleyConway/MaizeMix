@@ -31,7 +31,7 @@ int main()
 
 	test_AudioSystem system;
 
-	auto clip = engine.CreateClip("/home/finley/GameShiz/Sounds/TestMusic.wav", true);
+	auto clip = engine.CreateClip("/home/finley/Desktop/bark.wav", false);
 
 	auto entity = CreateTestDummy(registry, clip);
 

@@ -82,7 +82,7 @@ namespace Mix {
 		sf::Music::setAttenuation(distance);
 	}
 
-	void Music::SetPlayback(float seconds)
+	void Music::SetPlaybackOffset(float seconds)
 	{
 		sf::Music::setPlayingOffset(sf::seconds(seconds));
 	}
