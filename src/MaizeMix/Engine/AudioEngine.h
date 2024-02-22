@@ -8,7 +8,7 @@
 #include <any>
 #include <set>
 
-#include "../Audio/SoundReference.h"
+#include "../Audio/Clip.h"
 
 namespace Mix {
 
@@ -103,8 +103,7 @@ namespace Mix {
 	 private:
 		sf::Time m_CurrentTime;
 
-		std::unordered_map<size_t, sf::SoundBuffer> m_SoundBuffers;
-		std::unordered_map<size_t, SoundReference> m_SoundReferences;
+		std::unordered_map<size_t, std::unique_ptr<Clip>> m_AudioClips;
 
 		std::unordered_map<uint8_t, Audio> m_CurrentPlayingAudio;
 		std::set<SoundEventData> m_AudioEventQueue;

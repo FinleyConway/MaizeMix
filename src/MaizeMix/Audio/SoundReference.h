@@ -1,24 +1,29 @@
 #pragma once
 
-#include "SFML/Audio.hpp"
+#include <SFML/Audio.hpp>
 #include <cstdint>
 #include <string>
+
+#include "Clip.h"
 
 namespace Mix {
 
 	class Music;
 
-	class SoundReference
+	class SoundReference : public Clip
 	{
 	 public:
 		SoundReference() = default;
-		~SoundReference();
+		~SoundReference() override;
 
-		bool OpenFromFile(const std::string& filename);
+		bool OpenFromFile(const std::string& filename) override;
 
-		sf::Time GetDuration() const;
-		uint32_t GetChannelCount() const;
-		uint32_t GetSampleRate() const;
+		sf::Time GetDuration() const override;
+		uint32_t GetChannelCount() const override;
+		uint32_t GetSampleRate() const override;
+		uint64_t GetSampleCount() const override;
+
+		void GetData(std::vector<int16_t>& samples, uint64_t offset) override;
 
 	 private:
 		void AttachReference(Music* music) const;
@@ -30,7 +35,9 @@ namespace Mix {
 		sf::Time m_Duration;
 		uint32_t m_ChannelCount = 0;
 		uint32_t m_SampleRate = 0;
+		uint64_t m_SampleCount = 0;
 
+		sf::InputSoundFile m_File;
 		std::string m_AudioPath; // used for sf::Music to act like setBuffer which would instead do openFromFile
 		mutable std::set<Music*> m_References;
 	};

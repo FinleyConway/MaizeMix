@@ -1,7 +1,10 @@
 #include "AudioEngine.h"
+#include "AudioFinishCallback.h"
+
+#include "../Audio/SoundReference.h"
+#include "../Audio/SoundBuffer.h"
 #include "../Audio/AudioClip.h"
 #include "../Audio/Music.h"
-#include "AudioFinishCallback.h"
 
 #include <iostream>
 #include <cmath>
@@ -16,32 +19,42 @@ namespace Mix {
 		// sfml boilerplate to create audio data
 		if (stream)
 		{
-			SoundReference soundReference;
+			auto soundReference = std::make_unique<SoundReference>();
 
-			if (soundReference.OpenFromFile(audioPath))
+			if (soundReference->OpenFromFile(audioPath))
 			{
 				id++;
 
-				m_SoundReferences.emplace(id, soundReference);
+				auto clip = AudioClip(id, stream, AudioClip::LoadState::Loaded);
 
-				return { id, soundReference.GetChannelCount(),
-						 soundReference.GetDuration().asSeconds(),
-						 soundReference.GetSampleRate(), stream, AudioClip::LoadState::Loaded };
+				clip.m_Duration = soundReference->GetDuration().asSeconds();
+				clip.m_Channels = soundReference->GetChannelCount();
+				clip.m_Frequency = soundReference->GetSampleRate();
+				clip.m_SampleCount = soundReference->GetSampleCount();
+
+				m_AudioClips.emplace(id, std::move(soundReference));
+
+				return clip;
 			}
 		}
 		else
 		{
-			sf::SoundBuffer soundBuffer;
+			auto soundBuffer = std::make_unique<SoundBuffer>();
 
-			if (soundBuffer.loadFromFile(audioPath))
+			if (soundBuffer->OpenFromFile(audioPath))
 			{
 				id++;
 
-				m_SoundBuffers.emplace(id, soundBuffer);
+				auto clip = AudioClip(id, stream, AudioClip::LoadState::Loaded);
 
-				return { id, soundBuffer.getChannelCount(),
-						 soundBuffer.getDuration().asSeconds(),
-						 soundBuffer.getSampleRate(), stream, AudioClip::LoadState::Loaded };
+				clip.m_Duration = soundBuffer->GetDuration().asSeconds();
+				clip.m_Channels = soundBuffer->GetChannelCount();
+				clip.m_Frequency = soundBuffer->GetSampleRate();
+				clip.m_SampleCount = soundBuffer->GetSampleCount();
+
+				m_AudioClips.emplace(id, std::move(soundBuffer));
+
+				return clip;
 			}
 		}
 
@@ -52,14 +65,7 @@ namespace Mix {
 	void AudioEngine::DestroyClip(AudioClip& clip)
 	{
 		// remove clip
-		if (clip.m_IsStreaming)
-		{
-			m_SoundReferences.erase(clip.m_ClipID);
-		}
-		else
-		{
-			m_SoundBuffers.erase(clip.m_ClipID);
-		}
+		m_AudioClips.erase(clip.m_ClipID);
 
 		// set clip to default
 		clip = AudioClip();
@@ -455,13 +461,13 @@ namespace Mix {
 
 	uint8_t AudioEngine::PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance, const std::any& userData)
 	{
-		if (m_SoundBuffers.contains(clip.m_ClipID))
+		if (m_AudioClips.contains(clip.m_ClipID))
 		{
-			const auto& buffer = m_SoundBuffers.at(clip.m_ClipID);
-
-			// set source properties
+			const auto& reference = m_AudioClips.at(clip.m_ClipID);
+			const auto& soundBuffer = static_cast<SoundBuffer&>(*reference); // this should be safe as we know it's going to be streamed.
 			sf::Sound sound;
-			sound.setBuffer(buffer);
+
+			sound.setBuffer(soundBuffer.GetBuffer());
 			sound.setVolume(LimitVolume(volume));
 			sound.setPitch(pitch);
 			sound.setLoop(loop);
@@ -493,13 +499,13 @@ namespace Mix {
 
 	uint8_t AudioEngine::PlayStreamedAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance, const std::any& userData)
 	{
-		if (m_SoundReferences.contains(clip.m_ClipID))
+		if (m_AudioClips.contains(clip.m_ClipID))
 		{
-			const auto& musicBuffer = m_SoundReferences.at(clip.m_ClipID);
-
 			// load music source
+			auto& reference = m_AudioClips.at(clip.m_ClipID);
+			auto& soundReference = static_cast<SoundReference&>(*reference); // this should be safe as we know it's going to be streamed.
 			auto music = std::make_shared<Music>();
-			if (!music->Load(musicBuffer))
+			if (!music->Load(soundReference))
 			{
 				return c_InvalidAudioSource;
 			}
