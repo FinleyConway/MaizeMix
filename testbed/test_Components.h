@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MaizeMix/MaizeMix.h"
+#include <MaizeMix/MaizeMix.h>
 
 struct PlayAudioSourceTag { };
 struct PauseAudioSourceTag { };

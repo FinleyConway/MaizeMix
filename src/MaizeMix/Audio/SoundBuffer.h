@@ -1,7 +1,8 @@
 #pragma once
 
 #include <SFML/Audio.hpp>
-#include "Clip.h"
+
+#include "MaizeMix/Audio/Clip.h"
 
 namespace Mix {
 

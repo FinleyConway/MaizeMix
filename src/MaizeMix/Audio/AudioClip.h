@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdint>
 
-#include "../Engine/AudioEngine.h"
+#include "MaizeMix/Engine/AudioEngine.h"
 
 namespace Mix {
 

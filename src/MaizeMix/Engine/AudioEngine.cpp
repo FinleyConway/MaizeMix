@@ -1,10 +1,10 @@
-#include "AudioEngine.h"
-#include "AudioFinishCallback.h"
+#include "MaizeMix/Engine/AudioEngine.h"
+#include "MaizeMix/Engine/AudioFinishCallback.h"
 
-#include "../Audio/SoundReference.h"
-#include "../Audio/SoundBuffer.h"
-#include "../Audio/AudioClip.h"
-#include "../Audio/Music.h"
+#include "MaizeMix/Audio/SoundReference.h"
+#include "MaizeMix/Audio/SoundBuffer.h"
+#include "MaizeMix/Audio/AudioClip.h"
+#include "MaizeMix/Audio/Music.h"
 
 #include <iostream>
 #include <cmath>

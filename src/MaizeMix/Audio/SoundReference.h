@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-#include "Clip.h"
+#include "MaizeMix/Audio/Clip.h"
 
 namespace Mix {
 

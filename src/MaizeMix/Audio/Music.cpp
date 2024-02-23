@@ -1,5 +1,5 @@
-#include "Music.h"
-#include "SoundReference.h"
+#include "MaizeMix/Audio/Music.h"
+#include "MaizeMix/Audio/SoundReference.h"
 
 namespace Mix {
 

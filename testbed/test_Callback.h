@@ -1,8 +1,9 @@
 #pragma once
 
-#include "MaizeMix/MaizeMix.h"
+#include <MaizeMix/MaizeMix.h>
+#include <entt/entt.hpp>
+
 #include "test_Components.h"
-#include "entt/entt.hpp"
 
 class test_Callback : public Mix::AudioFinishCallback
 {
