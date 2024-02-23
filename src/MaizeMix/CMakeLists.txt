@@ -8,7 +8,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SFML)
 
 # Define the library type based on the BUILD_SHARED_LIBS option
-if(BUILD_SHARED_LIBS)
+if (MIX_BUILD_SHARED_LIBS)
     set(LIB_TYPE SHARED)
 else()
     set(LIB_TYPE STATIC)
