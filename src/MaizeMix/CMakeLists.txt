@@ -1,5 +1,3 @@
-option(BUILD_SHARED_LIBS "Build Maize Mix as a shared library" OFF)
-
 # Fetch SFML library
 include(FetchContent)
 FetchContent_Declare(
