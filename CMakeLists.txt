@@ -31,7 +31,7 @@ add_library(MaizeMix ${LIB_TYPE}
         src/MaizeMix/Engine/AudioEngine.cpp
 )
 
-target_include_directories(MaizeMix PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(MaizeMix PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 if (MIX_BUILD_TESTBED)
     add_subdirectory(testbed)
