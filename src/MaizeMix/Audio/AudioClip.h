@@ -9,15 +9,11 @@ namespace Mix {
 
 	class AudioClip
 	{
-	 private:
-		enum class LoadState
-		{
-			Unloaded = 0, Loaded, Failed
-		};
-
 	 public:
 		AudioClip() = default;
 		~AudioClip() = default;
+
+        enum class LoadState { Unloaded = 0, Loaded, Failed };
 
 		uint32_t GetChannels() const { return m_Channels; }
 		float GetDuration() const { return m_Duration; }
@@ -31,7 +27,7 @@ namespace Mix {
 	 private:
 		friend class AudioEngine;
 
-		AudioClip(size_t clipID, bool stream, AudioClip::LoadState loadState) :
+		AudioClip(size_t clipID, bool stream, LoadState loadState) :
 			m_ClipID(clipID), m_IsStreaming(stream), m_LoadState(loadState)
 		{
 		}
