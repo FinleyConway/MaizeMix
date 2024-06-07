@@ -1,6 +1,7 @@
 #include <SFML/Window.hpp>
 #include <entt/entt.hpp>
 #include <MaizeMix/MaizeMix.h>
+#include <iostream>
 
 #include "test_Components.h"
 #include "test_AudioSystem.h"
@@ -31,9 +32,10 @@ int main()
 
 	test_AudioSystem system;
 
-	auto clip = engine.CreateClip("/home/finley/GameShiz/Sounds/Pew.wav", false);
+	auto clip = engine.CreateClip("Clips/Pew.wav", false);
 
 	auto entity = CreateTestDummy(registry, clip);
+	auto entity2 = CreateTestDummy(registry, clip);
 
 	while (window.isOpen())
 	{
@@ -48,6 +50,8 @@ int main()
 		}
 
 		float deltaTime = clock.restart().asSeconds();
+
+        window.setTitle("Sounds - frame time: " + std::to_string(deltaTime));
 
 		static bool pressed = false;
 		static bool pressed1 = false;

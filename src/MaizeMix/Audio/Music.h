@@ -25,7 +25,7 @@ namespace Mix {
 		void SetPosition(float x, float y, float depth);
 		void SetMinDistance(float distance);
 		void SetMaxDistance(float distance);
-		void SetPlaybackOffset(float seconds);
+		void SetPlayingOffset(float seconds);
 		void SetRelativeToListener(bool relative);
 
 		const SoundReference* GetReference() const;

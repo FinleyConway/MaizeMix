@@ -71,25 +71,29 @@ namespace Mix {
 
 		struct Audio
 		{
-			std::variant<sf::Sound, std::shared_ptr<Music>> sound;
+            sf::Sound sound;
+            std::shared_ptr<Music> music = nullptr;
+
 			const SoundEventData* event = nullptr;
-			const std::any userData;
+			std::any userData;
 			float previousVolume = 0;
             float previousTimeOffset = 0;
 
 			Audio() = default;
-			Audio(const std::shared_ptr<Music>& audio, const SoundEventData* event, const std::any& userData)
-				: sound(audio), event(event), userData(userData)
+            Audio(sf::Sound&& audio, const SoundEventData* event, const std::any& userData)
+                    : sound(audio), event(event), userData(userData)
+            {
+            }
+			Audio(std::shared_ptr<Music>&& audio, const SoundEventData* event, const std::any& userData)
+				: music(audio), event(event), userData(userData)
 			{
 			}
-			Audio(const sf::Sound& audio, const SoundEventData* event, const std::any& userData)
-				: sound(audio), event(event), userData(userData)
-			{
-			}
+
+            bool IsSoundValid() const { return sound.getBuffer() != nullptr; }
+            bool IsMusicValid() const { return music != nullptr; }
 		};
 
 	 private:
-		float LimitVolume(float volume) const;
 		bool HasHitMaxAudioSources() const;
 		float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
 		float GetDuration(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
@@ -107,7 +111,6 @@ namespace Mix {
 
 		std::unordered_map<uint8_t, Audio> m_CurrentPlayingAudio;
 		std::set<SoundEventData> m_AudioEventQueue;
-
 		std::vector<uint8_t> m_UnusedIDs;
 
 		AudioFinishCallback* m_Callback = nullptr;

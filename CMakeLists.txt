@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(MIX_BUILD_SHARED_LIBS "Build Maize Mix as a shared library" OFF)
-set(MIX_BUILD_TESTBED OFF)
+set(MIX_BUILD_TESTBED ON)
 
 # import sfml
 FetchContent_Declare(sfml GIT_REPOSITORY https://github.com/SFML/SFML.git GIT_TAG 2.6.1)
@@ -29,6 +29,7 @@ add_library(MaizeMix ${LIB_TYPE}
         src/MaizeMix/Audio/SoundReference.cpp
         src/MaizeMix/Audio/SoundReference.h
         src/MaizeMix/Engine/AudioEngine.cpp
+        src/MaizeMix/Engine/AudioFinishCallback.h
 )
 
 target_include_directories(MaizeMix PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
