@@ -1,45 +1,41 @@
 #pragma once
 
-#include <string>
-#include <cstdint>
+#include <memory>
 
-#include "MaizeMix/Engine/AudioEngine.h"
+#include "MaizeMix/Audio/Clip.h"
 
 namespace Mix {
 
-	class AudioClip
-	{
-	 public:
-		AudioClip() = default;
-		~AudioClip() = default;
+    class AudioClip
+    {
+    public:
+        AudioClip() = default;
 
         enum class LoadState { Unloaded = 0, Loaded, Failed };
 
-		uint32_t GetChannels() const { return m_Channels; }
-		float GetDuration() const { return m_Duration; }
-		uint32_t GetFrequency() const { return m_Frequency; }
-		uint64_t GetSampleCount() const { return m_SampleCount; }
-		bool IsLoadInBackground() const { return m_IsStreaming; }
-		LoadState GetLoadState() const { return m_LoadState; }
+        uint32_t GetChannel() const;
+        float GetDuration() const;
+        uint32_t GetFrequency() const;
+        uint64_t GetSampleCount() const;
+        bool IsLoadInBackground() const;
+        LoadState GetLoadState() const;
 
-		bool operator==(const AudioClip& other) const { return other.m_ClipID == m_ClipID; }
+    private:
+        friend class AudioEngine;
+        friend class AudioManager;
 
-	 private:
-		friend class AudioEngine;
+        AudioClip(size_t clipID, const std::shared_ptr<Clip>& clip, bool stream, LoadState loadState) :
+            m_ClipID(clipID), m_Handle(clip), m_IsStreaming(stream), m_LoadState(loadState)
+        {
+        }
 
-		AudioClip(size_t clipID, bool stream, LoadState loadState) :
-			m_ClipID(clipID), m_IsStreaming(stream), m_LoadState(loadState)
-		{
-		}
+        bool IsValid() const { return m_ClipID != 0 && m_Handle != nullptr; }
 
-		size_t m_ClipID = 0;
+        size_t m_ClipID = 0;
+        std::shared_ptr<Clip> m_Handle = nullptr;
 
-		uint32_t m_Channels = 0;
-		float m_Duration = 0;
-		uint32_t m_Frequency = 0;
-		uint64_t m_SampleCount = 0;
-		bool m_IsStreaming = false;
-		LoadState m_LoadState = LoadState::Unloaded;
-	};
+        bool m_IsStreaming = false;
+        LoadState m_LoadState = LoadState::Unloaded;
+    };
 
 } // Mix

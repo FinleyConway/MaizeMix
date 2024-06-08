@@ -12,70 +12,9 @@
 
 namespace Mix {
 
-	AudioClip AudioEngine::CreateClip(const std::string& audioPath, bool stream)
-	{
-		static size_t id = 0;
-
-		// sfml boilerplate to create audio data
-		if (stream)
-		{
-			auto soundReference = std::make_unique<SoundReference>();
-
-			if (soundReference->OpenFromFile(audioPath))
-			{
-				id++;
-
-				auto clip = AudioClip(id, stream, AudioClip::LoadState::Loaded);
-
-				clip.m_Duration = soundReference->GetDuration().asSeconds();
-				clip.m_Channels = soundReference->GetChannelCount();
-				clip.m_Frequency = soundReference->GetSampleRate();
-				clip.m_SampleCount = soundReference->GetSampleCount();
-
-				m_AudioClips.emplace(id, std::move(soundReference));
-
-				return clip;
-			}
-		}
-		else
-		{
-			auto soundBuffer = std::make_unique<SoundBuffer>();
-
-			if (soundBuffer->OpenFromFile(audioPath))
-			{
-				id++;
-
-				auto clip = AudioClip(id, stream, AudioClip::LoadState::Loaded);
-
-				clip.m_Duration = soundBuffer->GetDuration().asSeconds();
-				clip.m_Channels = soundBuffer->GetChannelCount();
-				clip.m_Frequency = soundBuffer->GetSampleRate();
-				clip.m_SampleCount = soundBuffer->GetSampleCount();
-
-				m_AudioClips.emplace(id, std::move(soundBuffer));
-
-				return clip;
-			}
-		}
-
-		// return a failed audio clip
-		return { c_InvalidClip, stream, AudioClip::LoadState::Failed };
-	}
-
-	void AudioEngine::DestroyClip(AudioClip& clip)
-	{
-		// remove clip
-		m_AudioClips.erase(clip.m_ClipID);
-
-		// set clip to default
-		clip = AudioClip();
-	}
-
 	uint8_t AudioEngine::PlayAudio(AudioClip& clip, float volume, float pitch, bool loop, const std::any& userData, float x, float y, float depth, float minDistance, float maxDistance)
 	{
-		if (clip.m_ClipID == c_InvalidClip) return c_InvalidAudioSource;
-
-		if (HasHitMaxAudioSources()) return c_InvalidAudioSource;
+		if (!clip.IsValid() || HasHitMaxAudioSources()) return c_InvalidAudioSource;
 
 		if (clip.IsLoadInBackground())
 		{
@@ -475,7 +414,6 @@ namespace Mix {
 
 	bool AudioEngine::HasHitMaxAudioSources() const
 	{
-        std::cout << m_AudioEventQueue.size() << std::endl;
 		if (m_AudioEventQueue.size() >= c_MaxAudioEmitters)
 		{
 			std::cerr << "Warning: Max audio reached! Cannot play more audio clips!" << std::endl;
@@ -516,10 +454,9 @@ namespace Mix {
 	uint8_t AudioEngine::PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance, const std::any& userData)
 	{
         // if it is a valid audio clip
-		if (m_AudioClips.contains(clip.m_ClipID))
+		if (clip.IsValid())
 		{
-			const auto& reference = m_AudioClips.at(clip.m_ClipID);
-			const auto& soundBuffer = static_cast<SoundBuffer&>(*reference); // this should be safe as we know its audio type.
+			const auto& soundBuffer = static_cast<SoundBuffer&>(*clip.m_Handle); // this should be safe as we know its audio type.
 
 			sf::Sound sound;
 			sound.setBuffer(soundBuffer.GetBuffer());
@@ -547,12 +484,10 @@ namespace Mix {
 	uint8_t AudioEngine::PlayStreamedAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance, const std::any& userData)
 	{
         // if it is a valid audio clip
-		if (m_AudioClips.contains(clip.m_ClipID))
+		if (clip.IsValid())
 		{
 			// load music source
-			auto& reference = m_AudioClips.at(clip.m_ClipID);
-			auto& soundReference = static_cast<SoundReference&>(*reference); // this should be safe as we know its audio type.
-
+			auto& soundReference = static_cast<SoundReference&>(*clip.m_Handle); // this should be safe as we know its audio type.
 			auto music = std::make_shared<Music>();
 
             // since this is a wrapper to make it act like sf::Sound we have to load it

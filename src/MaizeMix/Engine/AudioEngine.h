@@ -8,8 +8,6 @@
 #include <any>
 #include <set>
 
-#include "MaizeMix/Audio/Clip.h"
-
 namespace Mix {
 
 	class AudioClip;
@@ -19,9 +17,6 @@ namespace Mix {
 	class AudioEngine
 	{
 	 public:
-		AudioClip CreateClip(const std::string& audioPath, bool stream);
-		void DestroyClip(AudioClip& clip);
-
 		uint8_t PlayAudio(AudioClip& clip, float volume, float pitch, bool loop, const std::any& userData, float x = 0, float y = 0, float depth = 0, float minDistance = 0, float maxDistance = 0);
 		void PauseAudio(uint8_t playingID);
 		void UnpauseAudio(uint8_t playingID);
@@ -106,8 +101,6 @@ namespace Mix {
 
 	 private:
 		sf::Time m_CurrentTime;
-
-		std::unordered_map<size_t, std::unique_ptr<Clip>> m_AudioClips;
 
 		std::unordered_map<uint8_t, Audio> m_CurrentPlayingAudio;
 		std::set<SoundEventData> m_AudioEventQueue;

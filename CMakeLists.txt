@@ -30,6 +30,10 @@ add_library(MaizeMix ${LIB_TYPE}
         src/MaizeMix/Audio/SoundReference.h
         src/MaizeMix/Engine/AudioEngine.cpp
         src/MaizeMix/Engine/AudioFinishCallback.h
+        src/MaizeMix/Audio/AudioClip.cpp
+        src/MaizeMix/Audio/AudioClip.h
+        src/MaizeMix/AudioManager.cpp
+        src/MaizeMix/AudioManager.h
 )
 
 target_include_directories(MaizeMix PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

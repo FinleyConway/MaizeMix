@@ -6,6 +6,7 @@
 #include "test_Components.h"
 #include "test_AudioSystem.h"
 #include "test_Callback.h"
+#include "MaizeMix/AudioManager.h"
 
 auto CreateTestDummy(entt::registry& registry, const Mix::AudioClip& clip)
 {
@@ -22,6 +23,7 @@ int main()
 {
 	sf::Window window = sf::Window(sf::VideoMode(500, 500), "Sounds");
 	Mix::AudioEngine engine;
+    Mix::AudioManager manager;
 	entt::registry registry;
 
 	test_Callback t(registry);
@@ -32,10 +34,9 @@ int main()
 
 	test_AudioSystem system;
 
-	auto clip = engine.CreateClip("Clips/Pew.wav", false);
+	auto clip = manager.CreateClip("Clips/Pew.wav", false);
 
 	auto entity = CreateTestDummy(registry, clip);
-	auto entity2 = CreateTestDummy(registry, clip);
 
 	while (window.isOpen())
 	{
@@ -51,7 +52,7 @@ int main()
 
 		float deltaTime = clock.restart().asSeconds();
 
-        window.setTitle("Sounds - frame time: " + std::to_string(deltaTime));
+        //window.setTitle("Sounds - frame time: " + std::to_string(deltaTime));
 
 		static bool pressed = false;
 		static bool pressed1 = false;
