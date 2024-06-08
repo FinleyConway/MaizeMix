@@ -21,19 +21,19 @@ else()
 endif()
 
 add_library(MaizeMix ${LIB_TYPE}
-        src/MaizeMix/Audio/Clip.h
+        src/MaizeMix/Audio/Data/Clip.h
         src/MaizeMix/Audio/Music.cpp
         src/MaizeMix/Audio/Music.h
-        src/MaizeMix/Audio/SoundBuffer.cpp
-        src/MaizeMix/Audio/SoundBuffer.h
-        src/MaizeMix/Audio/SoundReference.cpp
-        src/MaizeMix/Audio/SoundReference.h
+        src/MaizeMix/Audio/Data/SoundBuffer.cpp
+        src/MaizeMix/Audio/Data/SoundBuffer.h
+        src/MaizeMix/Audio/Data/SoundReference.cpp
+        src/MaizeMix/Audio/Data/SoundReference.h
         src/MaizeMix/Engine/AudioEngine.cpp
         src/MaizeMix/Engine/AudioFinishCallback.h
         src/MaizeMix/Audio/AudioClip.cpp
         src/MaizeMix/Audio/AudioClip.h
-        src/MaizeMix/AudioManager.cpp
-        src/MaizeMix/AudioManager.h
+        src/MaizeMix/Engine/AudioManager.cpp
+        src/MaizeMix/Engine/AudioManager.h
 )
 
 target_include_directories(MaizeMix PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

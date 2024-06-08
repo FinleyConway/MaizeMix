@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "MaizeMix/Audio/Clip.h"
+#include "MaizeMix/Audio/Data/Clip.h"
 
 namespace Mix {
 
@@ -19,6 +19,14 @@ namespace Mix {
         uint64_t GetSampleCount() const;
         bool IsLoadInBackground() const;
         LoadState GetLoadState() const;
+
+        void GetData(std::vector<int16_t>& samples, uint64_t offset)
+        {
+            if (m_Handle != nullptr)
+            {
+                m_Handle->GetData(samples, offset);
+            }
+        }
 
     private:
         friend class AudioEngine;

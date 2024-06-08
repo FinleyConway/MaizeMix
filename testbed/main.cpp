@@ -6,7 +6,7 @@
 #include "test_Components.h"
 #include "test_AudioSystem.h"
 #include "test_Callback.h"
-#include "MaizeMix/AudioManager.h"
+#include "MaizeMix/Engine/AudioManager.h"
 
 auto CreateTestDummy(entt::registry& registry, const Mix::AudioClip& clip)
 {

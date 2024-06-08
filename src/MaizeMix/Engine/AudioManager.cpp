@@ -1,8 +1,8 @@
-#include "MaizeMix/AudioManager.h"
+#include "AudioManager.h"
 
 #include "MaizeMix/Audio/AudioClip.h"
-#include "MaizeMix/Audio/SoundReference.h"
-#include "MaizeMix/Audio/SoundBuffer.h"
+#include "MaizeMix/Audio/Data/SoundReference.h"
+#include "MaizeMix/Audio/Data/SoundBuffer.h"
 
 namespace Mix {
 
