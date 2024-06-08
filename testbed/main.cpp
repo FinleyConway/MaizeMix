@@ -1,7 +1,6 @@
 #include <SFML/Window.hpp>
 #include <entt/entt.hpp>
 #include <MaizeMix/MaizeMix.h>
-#include <iostream>
 
 #include "test_Components.h"
 #include "test_AudioSystem.h"
