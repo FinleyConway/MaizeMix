@@ -73,6 +73,12 @@ namespace Mix {
                 if (soundData.sound.getStatus() != sf::SoundSource::Paused)
                 {
                     soundData.sound.play();
+
+                    // add the audio clip back into the queue based on its playing position
+                    float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
+                    float stopTime = m_CurrentTime.asSeconds() + playingTimeLeft;
+
+                    m_AudioEventQueue.emplace(playingID, stopTime);
                 }
             }
             else if (soundData.IsMusicValid())
@@ -81,14 +87,14 @@ namespace Mix {
                 if (soundData.music->GetStatus() != sf::SoundSource::Paused)
                 {
                     soundData.music->Play();
+
+                    // add the audio clip back into the queue based on its playing position
+                    float playingTimeLeft = GetDuration(soundData.music) - GetPlayingOffset(soundData.music);
+                    float stopTime = m_CurrentTime.asSeconds() + playingTimeLeft;
+
+                    m_AudioEventQueue.emplace(playingID, stopTime);
                 }
             }
-
-            // add the audio clip back into the queue based on its playing position
-			float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
-			float stopTime = m_CurrentTime.asSeconds() + playingTimeLeft;
-
-			m_AudioEventQueue.emplace(playingID, stopTime);
 		}
 	}
 
@@ -138,6 +144,18 @@ namespace Mix {
                 if (soundData.sound.getLoop() == loop) return;
 
                  soundData.sound.setLoop(loop);
+
+                // this shouldn't really happen, but ill place this here just in-case...
+                assert(soundData.event != nullptr);
+
+                // remove current sound event
+                m_AudioEventQueue.erase(*soundData.event);
+
+                // recreate sound event with new event time
+                float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
+                float stopTime = loop ? std::numeric_limits<float>::max() : m_CurrentTime.asSeconds() + playingTimeLeft;
+
+                m_AudioEventQueue.emplace(playingID, stopTime);
             }
             else if (soundData.IsMusicValid())
             {
@@ -145,19 +163,19 @@ namespace Mix {
                 if (soundData.music->GetLoop() == loop) return;
 
                 soundData.music->SetLoop(loop);
+
+                // this shouldn't really happen, but ill place this here just in-case...
+                assert(soundData.event != nullptr);
+
+                // remove current sound event
+                m_AudioEventQueue.erase(*soundData.event);
+
+                // recreate sound event with new event time
+                float playingTimeLeft = GetDuration(soundData.music) - GetPlayingOffset(soundData.music);
+                float stopTime = loop ? std::numeric_limits<float>::max() : m_CurrentTime.asSeconds() + playingTimeLeft;
+
+                m_AudioEventQueue.emplace(playingID, stopTime);
             }
-
-            // this shouldn't really happen, but ill place this here just in-case...
-			assert(soundData.event != nullptr);
-
-            // remove current sound event
-			m_AudioEventQueue.erase(*soundData.event);
-
-			// recreate sound event with new event time
-			float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
-			float stopTime = loop ? std::numeric_limits<float>::max() : m_CurrentTime.asSeconds() + playingTimeLeft;
-
-			m_AudioEventQueue.emplace(playingID, stopTime);
 		}
 	}
 
@@ -257,25 +275,6 @@ namespace Mix {
 		}
 	}
 
-	void AudioEngine::SetAudioPlayback(uint8_t playingID, float seconds)
-	{
-        // check if the requested audio is playing
-        if (m_CurrentPlayingAudio.contains(playingID))
-        {
-            auto& soundData = m_CurrentPlayingAudio.at(playingID);
-
-            // check to see if it's either a music clip or sound effect clip
-            if (soundData.IsSoundValid())
-            {
-                soundData.sound.setPlayingOffset(sf::seconds(seconds));
-            }
-            else if (soundData.IsMusicValid())
-            {
-                soundData.music->SetPlayingOffset(seconds);
-            }
-        }
-	}
-
 	void AudioEngine::SetSpatializationMode(uint8_t playingID, bool isSpatialization)
 	{
         // check if the requested audio is playing
@@ -330,25 +329,35 @@ namespace Mix {
             if (soundData.IsSoundValid())
             {
                 soundData.sound.setPlayingOffset(sf::seconds(time));
-                loop = soundData.sound.getLoop();
+
+                // this shouldn't really happen, but ill place this here just in-case...
+                assert(soundData.event != nullptr);
+
+                // remove current sound event
+                m_AudioEventQueue.erase(*soundData.event);
+
+                // recreate sound event with new event time
+                float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
+                float stopTime = soundData.sound.getLoop() ? std::numeric_limits<float>::max() : m_CurrentTime.asSeconds() + playingTimeLeft;
+
+                m_AudioEventQueue.emplace(playingID, stopTime);
             }
             else if (soundData.IsMusicValid())
             {
                 soundData.music->SetPlayingOffset(time);
-                loop = soundData.music->GetLoop();
+
+                // this shouldn't really happen, but ill place this here just in-case...
+                assert(soundData.event != nullptr);
+
+                // remove current sound event
+                m_AudioEventQueue.erase(*soundData.event);
+
+                // recreate sound event with new event time
+                float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
+                float stopTime = soundData.music->GetLoop() ? std::numeric_limits<float>::max() : m_CurrentTime.asSeconds() + playingTimeLeft;
+
+                m_AudioEventQueue.emplace(playingID, stopTime);
             }
-
-            // this shouldn't really happen, but ill place this here just in-case...
-            assert(soundData.event != nullptr);
-
-            // remove current sound event
-            m_AudioEventQueue.erase(*soundData.event);
-
-            // recreate sound event with new event time
-            float playingTimeLeft = GetDuration(soundData.sound) - GetPlayingOffset(soundData.sound);
-            float stopTime = loop ? std::numeric_limits<float>::max() : m_CurrentTime.asSeconds() + playingTimeLeft;
-
-            m_AudioEventQueue.emplace(playingID, stopTime);
         }
     }
 
@@ -423,33 +432,25 @@ namespace Mix {
 		return false;
 	}
 
-	float AudioEngine::GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant)
+	float AudioEngine::GetPlayingOffset(const sf::Sound& sound)
 	{
-		if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundVariant))
-		{
-			return (*music)->GetPlayingOffset().asSeconds();
-		}
-		else if (auto* sound = std::get_if<sf::Sound>(&soundVariant))
-		{
-			return sound->getPlayingOffset().asSeconds();
-		}
-
-		return 0.0f;
+		return sound.getPlayingOffset().asSeconds();
 	}
 
-	float AudioEngine::GetDuration(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant)
-	{
-		if (auto* music = std::get_if<std::shared_ptr<Music>>(&soundVariant))
-		{
-			return (*music)->GetDuration().asSeconds();
-		}
-		else if (auto* sound = std::get_if<sf::Sound>(&soundVariant))
-		{
-			return sound->getBuffer()->getDuration().asSeconds();
-		}
+    float AudioEngine::GetPlayingOffset(const std::shared_ptr<Music>& music)
+    {
+        return music->GetPlayingOffset().asSeconds();
+    }
 
-		return 0.0f;
+	float AudioEngine::GetDuration(const sf::Sound& sound)
+	{
+		return sound.getBuffer()->getDuration().asSeconds();
 	}
+
+    float AudioEngine::GetDuration(const std::shared_ptr<Music>& music)
+    {
+        return music->GetDuration().asSeconds();
+    }
 
 	uint8_t AudioEngine::PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance, const std::any& userData)
 	{

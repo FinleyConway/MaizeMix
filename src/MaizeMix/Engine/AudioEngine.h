@@ -27,7 +27,6 @@ namespace Mix {
 		void SetAudioVolume(uint8_t playingID, float volume);
 		void SetAudioPitch(uint8_t playingID, float pitch);
 		void SetAudioPosition(uint8_t playingID, float x, float y, float depth, float minDistance, float maxDistance);
-		void SetAudioPlayback(uint8_t playingID, float seconds);
 		void SetSpatializationMode(uint8_t playingID, bool isSpatialization);
         void SetAudioOffsetTime(uint8_t playingID, float time);
 
@@ -90,8 +89,10 @@ namespace Mix {
 
 	 private:
 		bool HasHitMaxAudioSources() const;
-		float GetPlayingOffset(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
-		float GetDuration(const std::variant<sf::Sound, std::shared_ptr<Music>>& soundVariant);
+		float GetPlayingOffset(const sf::Sound& sound);
+		float GetPlayingOffset(const std::shared_ptr<Music>& music);
+		float GetDuration(const sf::Sound& sound);
+		float GetDuration(const std::shared_ptr<Music>& music);
 
 		uint8_t PlayAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance, const std::any& userData);
 		uint8_t PlayStreamedAudioClip(AudioClip& clip, float volume, float pitch, bool loop, float x, float y, float depth, float minDistance, float maxDistance, const std::any& userData);
