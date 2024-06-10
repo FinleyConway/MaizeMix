@@ -184,8 +184,10 @@ namespace Mix {
         // check if the requested audio is playing
 		if (m_CurrentPlayingAudio.contains(playingID))
 		{
-			auto &soundData = m_CurrentPlayingAudio.at(playingID);
+			auto& soundData = m_CurrentPlayingAudio.at(playingID);
 			float volume = mute ? 0.0f : soundData.previousVolume;
+
+            soundData.isMute = mute;
 
             // check to see if it's either a music clip or sound effect clip
             if (soundData.IsSoundValid())
@@ -207,6 +209,9 @@ namespace Mix {
 		if (m_CurrentPlayingAudio.contains(playingID))
 		{
 			auto& soundData = m_CurrentPlayingAudio.at(playingID);
+
+            if (soundData.isMute) return;
+
             float clampedVolume = std::clamp(volume, 0.0f, 100.0f);;
 
             // check to see if it's either a music clip or sound effect clip

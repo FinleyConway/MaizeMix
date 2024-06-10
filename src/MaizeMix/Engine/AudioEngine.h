@@ -72,6 +72,7 @@ namespace Mix {
 			std::any userData;
 			float previousVolume = 0;
             float previousTimeOffset = 0;
+            bool isMute = false;
 
 			Audio() = default;
             Audio(sf::Sound&& audio, const SoundEventData* event, const std::any& userData)
