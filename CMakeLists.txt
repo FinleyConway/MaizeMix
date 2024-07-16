@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(MIX_BUILD_SHARED_LIBS "Build Maize Mix as a shared library" OFF)
-set(MIX_BUILD_TESTBED ON)
+option(MIX_BUILD_TESTBED OFF)
 
 # import sfml
 FetchContent_Declare(sfml GIT_REPOSITORY https://github.com/SFML/SFML.git GIT_TAG 2.6.1)
