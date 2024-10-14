@@ -8,7 +8,7 @@ namespace Mix {
 		std::set<Music*> music;
 		music.swap(m_References);
 
-		for (auto it : music)
+		for (auto* it : music)
 		{
 			it->ResetReference();
 		}
@@ -49,29 +49,6 @@ namespace Mix {
 	uint64_t SoundReference::GetSampleCount() const
 	{
 		return m_SampleCount;
-	}
-
-	void SoundReference::GetData(std::vector<int16_t>& samples, uint64_t offset)
-	{
-		uint64_t sampleCount = GetSampleCount();
-		uint64_t effectiveOffset = offset % sampleCount;
-
-		samples.resize(sampleCount);
-
-		// set the offset seek position
-		m_File.seek(effectiveOffset);
-
-		// read clip
-		uint64_t bytesRead = m_File.read(samples.data(), sampleCount - effectiveOffset);
-
-		// if the read length is longer than the clip length, reset the position and read the remaining samples from the start of the clip
-		if (bytesRead < sampleCount - effectiveOffset)
-		{
-			m_File.seek(0);
-			bytesRead += m_File.read(samples.data() + bytesRead, sampleCount - bytesRead);
-		}
-
-		samples.resize(bytesRead);
 	}
 
 	void SoundReference::AttachReference(Music* music) const

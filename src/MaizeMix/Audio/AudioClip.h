@@ -19,7 +19,6 @@ namespace Mix {
         uint64_t GetSampleCount() const;
         bool IsLoadInBackground() const;
         LoadState GetLoadState() const;
-        void GetData(std::vector<int16_t>& samples, uint64_t offset);
 
     private:
         friend class AudioEngine;

@@ -27,16 +27,9 @@ namespace Mix {
 		return m_Buffer.getSampleCount();
 	}
 
-	void SoundBuffer::GetData(std::vector<int16_t>& samples, uint64_t offset)
+	const sf::SoundBuffer& SoundBuffer::GetBuffer() const
 	{
-		const int16_t* bufferSamples = m_Buffer.getSamples();
-		uint64_t sampleCount = m_Buffer.getSampleCount();
-
-		samples.resize(sampleCount);
-
-		uint64_t effectiveOffset = offset % sampleCount;
-
-		std::copy(bufferSamples + effectiveOffset, bufferSamples + sampleCount, samples.begin() + effectiveOffset);
+		return m_Buffer;
 	}
 
 } // Mix

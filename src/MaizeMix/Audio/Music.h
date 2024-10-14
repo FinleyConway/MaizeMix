@@ -6,12 +6,12 @@ namespace Mix {
 
 	class SoundReference;
 
-	class Music : private sf::Music
+	class Music final : sf::Music
 	{
 	 public:
 		Music() = default;
 		explicit Music(const SoundReference& soundReference);
-		~Music();
+		~Music() override;
 
 		void Play();
 		void Pause();
@@ -33,7 +33,7 @@ namespace Mix {
 		bool GetLoop() const;
 		sf::Time GetPlayingOffset() const;
 		sf::Time GetDuration() const;
-        sf::SoundSource::Status GetStatus() const;
+        Status GetStatus() const;
 		bool IsRelativeToListener() const;
 
 		void ResetReference();

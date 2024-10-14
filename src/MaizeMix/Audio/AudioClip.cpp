@@ -26,7 +26,7 @@ namespace Mix {
     {
         if (m_Handle != nullptr)
         {
-            m_Handle->GetSampleRate();
+            return m_Handle->GetSampleRate();
         }
 
         return 0;
@@ -36,7 +36,7 @@ namespace Mix {
     {
         if (m_Handle != nullptr)
         {
-            m_Handle->GetSampleCount();
+            return m_Handle->GetSampleCount();
         }
 
         return 0;
@@ -50,14 +50,6 @@ namespace Mix {
     AudioClip::LoadState AudioClip::GetLoadState() const
     {
         return m_LoadState;
-    }
-
-    void AudioClip::GetData(std::vector<int16_t> &samples, uint64_t offset)
-    {
-        if (m_Handle != nullptr)
-        {
-            m_Handle->GetData(samples, offset);
-        }
     }
 
 } // Mix

@@ -6,7 +6,7 @@
 
 namespace Mix {
 
- 	class SoundBuffer : public Clip
+ 	class SoundBuffer final : public Clip
 	{
 	 public:
 		bool OpenFromFile(const std::string& filename) override;
@@ -16,11 +16,9 @@ namespace Mix {
 		uint32_t GetSampleRate() const override;
 		uint64_t GetSampleCount() const override;
 
-		void GetData(std::vector<int16_t>& samples, uint64_t offset) override;
+		const sf::SoundBuffer& GetBuffer() const;
 
-		const sf::SoundBuffer& GetBuffer() const { return m_Buffer; }
-
-	 private:
+	private:
 		sf::SoundBuffer m_Buffer;
 	};
 

@@ -123,4 +123,4 @@ MaizeMix is under the [MIT license](https://github.com/FinleyConway/MaizeMix/blo
 ## External libraries used by MaizeMix
 
 - [SFML](https://github.com/SFML/SFML) is under the [zLib license](https://github.com/SFML/SFML/blob/master/license.md)
-- [entt](https://github.com/skypjack/entt) is under the [MIT license](https://github.com/skypjack/entt/blob/master/LICENSE) (testbed)
+- [flecs](https://github.com/SanderMertens/flecs) is under the [MIT license](https://github.com/SanderMertens/flecs/blob/master/LICENSE) (test)

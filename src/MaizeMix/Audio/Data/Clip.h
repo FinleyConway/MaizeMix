@@ -16,8 +16,6 @@ namespace Mix {
 		virtual uint32_t GetChannelCount() const = 0;
 		virtual uint32_t GetSampleRate() const = 0;
 		virtual uint64_t GetSampleCount() const = 0;
-
-		virtual void GetData(std::vector<int16_t>& samples, uint64_t offset) = 0;
 	};
 
 } // Mix

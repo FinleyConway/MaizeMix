@@ -10,7 +10,7 @@ namespace Mix {
 
 	class Music;
 
-	class SoundReference : public Clip
+	class SoundReference final : public Clip
 	{
 	 public:
 		SoundReference() = default;
@@ -22,8 +22,6 @@ namespace Mix {
 		uint32_t GetChannelCount() const override;
 		uint32_t GetSampleRate() const override;
 		uint64_t GetSampleCount() const override;
-
-		void GetData(std::vector<int16_t>& samples, uint64_t offset) override;
 
 	 private:
 		void AttachReference(Music* music) const;

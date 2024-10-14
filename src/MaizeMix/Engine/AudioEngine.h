@@ -3,7 +3,6 @@
 #include <SFML/Audio.hpp>
 
 #include <unordered_map>
-#include <variant>
 #include <memory>
 #include <any>
 #include <set>
