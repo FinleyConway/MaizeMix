@@ -8,7 +8,7 @@ enable_testing()
 
 add_executable(test
         AudioManager.test.cpp
-        AudioEngine.test.cpp
+        SoundHandler.test.cpp
 )
 
 target_include_directories(test PRIVATE ${CMAKE_SOURCE_DIR}/src)

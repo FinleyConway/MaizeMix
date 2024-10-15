@@ -4,9 +4,9 @@ namespace Mix {
 
     uint32_t AudioClip::GetChannel() const
     {
-        if (m_Handle != nullptr)
+        if (const auto handle = m_Handle.lock())
         {
-            return m_Handle->GetChannelCount();
+            return handle->GetChannelCount();
         }
 
         return 0;
@@ -14,9 +14,9 @@ namespace Mix {
 
     float AudioClip::GetDuration() const
     {
-        if (m_Handle != nullptr)
+        if (const auto handle = m_Handle.lock())
         {
-            return m_Handle->GetDuration().asSeconds();
+            return handle->GetDuration().asSeconds();
         }
 
         return 0.0f;
@@ -24,9 +24,9 @@ namespace Mix {
 
     uint32_t AudioClip::GetFrequency() const
     {
-        if (m_Handle != nullptr)
+        if (const auto handle = m_Handle.lock())
         {
-            return m_Handle->GetSampleRate();
+            return handle->GetSampleRate();
         }
 
         return 0;
@@ -34,9 +34,9 @@ namespace Mix {
 
     uint64_t AudioClip::GetSampleCount() const
     {
-        if (m_Handle != nullptr)
+        if (const auto handle = m_Handle.lock())
         {
-            return m_Handle->GetSampleCount();
+            return handle->GetSampleCount();
         }
 
         return 0;
@@ -50,6 +50,11 @@ namespace Mix {
     AudioClip::LoadState AudioClip::GetLoadState() const
     {
         return m_LoadState;
+    }
+
+    bool AudioClip::IsValid() const
+    {
+        return !m_Handle.expired();
     }
 
 } // Mix

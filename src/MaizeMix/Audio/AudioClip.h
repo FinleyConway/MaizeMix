@@ -19,6 +19,7 @@ namespace Mix {
         uint64_t GetSampleCount() const;
         bool IsLoadInBackground() const;
         LoadState GetLoadState() const;
+        bool IsValid() const;
 
     private:
         friend class AudioEngine;
@@ -29,10 +30,8 @@ namespace Mix {
         {
         }
 
-        bool IsValid() const { return m_ClipID != 0 && m_Handle != nullptr; }
-
         size_t m_ClipID = 0;
-        std::shared_ptr<Clip> m_Handle = nullptr;
+        std::weak_ptr<Clip> m_Handle;
 
         bool m_IsStreaming = false;
         LoadState m_LoadState = LoadState::Unloaded;
