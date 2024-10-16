@@ -34,6 +34,8 @@ add_library(MaizeMix ${LIB_TYPE}
 
         src/MaizeMix/Engine/EngineHandler/SoundHandler.cpp
         src/MaizeMix/Engine/EngineHandler/SoundHandler.h
+        src/MaizeMix/Engine/EngineHandler/StreamHandler.cpp
+        src/MaizeMix/Engine/EngineHandler/StreamHandler.h
         src/MaizeMix/Engine/EngineHandler/SoundData.h
 
         src/MaizeMix/Engine/AudioEngine.cpp

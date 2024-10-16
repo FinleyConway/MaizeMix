@@ -10,23 +10,23 @@ namespace Mix {
 
 	bool SoundHandler::PlayClip(const SoundBuffer& clip, const AudioSpecification& specification, uint64_t entity, std::set<AudioEventData>& event, uint8_t audioSourceID, float currentTime)
 	{
-		sf::Sound sound;
-		sound.setBuffer(clip.GetBuffer());
-		sound.setVolume(std::clamp(specification.volume, 0.0f, 100.0f));
-		sound.setPitch(specification.pitch);
-		sound.setLoop(specification.loop);
-		sound.setPosition(specification.x, specification.y, specification.depth);
-		sound.setMinDistance(specification.minDistance);
-		sound.setAttenuation(specification.maxDistance);
-
 		const float stopTime = specification.loop ? std::numeric_limits<float>::max() : currentTime + clip.GetDuration().asSeconds();
 		const auto [it, success] = event.emplace(audioSourceID, stopTime);
 
 		if (success)
 		{
 			// construct audio source and play it
-			m_CurrentPlayingAudio.try_emplace(audioSourceID, std::move(sound), it, entity);
-			m_CurrentPlayingAudio.at(audioSourceID).sound.play();
+			m_CurrentPlayingAudio.try_emplace(audioSourceID, it, entity);
+
+			auto& sound = m_CurrentPlayingAudio.at(audioSourceID).sound;
+			sound.setBuffer(clip.GetBuffer());
+			sound.setVolume(std::clamp(specification.volume, 0.0f, 100.0f));
+			sound.setPitch(specification.pitch);
+			sound.setLoop(specification.loop);
+			sound.setPosition(specification.x, specification.y, specification.depth);
+			sound.setMinDistance(specification.minDistance);
+			sound.setAttenuation(specification.maxDistance);
+			sound.play();
 
 			return true;
 		}
@@ -149,7 +149,7 @@ namespace Mix {
 
 		if (soundData.IsValid())
 		{
-			soundData.sound.setVolume(pitch);
+			soundData.sound.setPitch(pitch);
 
 			return true;
 		}
@@ -160,10 +160,10 @@ namespace Mix {
 	bool SoundHandler::SetPosition(uint8_t playingID, float x, float y, float depth, float minDistance, float maxDistance)
 	{
 		auto& soundData = m_CurrentPlayingAudio.at(playingID);
+		auto& sound = soundData.sound;
 
 		if (soundData.IsValid())
 		{
-			auto& sound = soundData.sound;
 
 			// sounds should always be at position 0 if its relative, so it acts as 2D
 			if (!sound.isRelativeToListener())
@@ -224,11 +224,17 @@ namespace Mix {
 	float SoundHandler::GetAudioOffsetTime(uint8_t playingID)
 	{
 		auto& soundData = m_CurrentPlayingAudio.at(playingID);
-		const float offset = soundData.sound.getPlayingOffset().asSeconds();
 
-		soundData.previousTimeOffset = offset;
+		if (soundData.IsValid())
+		{
+			const float offset = soundData.sound.getPlayingOffset().asSeconds();
 
-		return offset;
+			soundData.previousTimeOffset = offset;
+
+			return offset;
+		}
+
+		return 0.0;
 	}
 
 	const SoundHandler::Sound& SoundHandler::GetEmitter(uint8_t playingID) const

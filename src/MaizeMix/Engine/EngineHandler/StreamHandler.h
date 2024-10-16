@@ -1,25 +1,22 @@
 #pragma once
 
-#include <SFML/Audio.hpp>
-
 #include <set>
-#include <cstdint>
+#include <memory>
 #include <functional>
 #include <unordered_map>
 
+#include "MaizeMix/Audio/Music.h"
+#include "MaizeMix/Audio/Data/SoundReference.h"
+#include "MaizeMix/Engine/EngineHandler/SoundData.h"
+
 namespace Mix {
 
-	class AudioClip;
-	class SoundBuffer;
-	struct AudioEventData;
-	struct AudioSpecification;
-
-	class SoundHandler
+	class StreamHandler
 	{
-	struct Sound;
+	struct Stream;
 
 	public:
-		bool PlayClip(const SoundBuffer& clip, const AudioSpecification& specification, uint64_t entity, std::set<AudioEventData>& event, uint8_t audioSourceID, float currentTime);
+		bool PlayClip(const SoundReference& clip, const AudioSpecification& specification, uint64_t entity, std::set<AudioEventData>& event, uint8_t audioSourceID, float currentTime);
 
 		bool PauseClip(uint8_t playingID, std::set<AudioEventData>& event);
 
@@ -43,7 +40,7 @@ namespace Mix {
 
 		float GetAudioOffsetTime(uint8_t playingID);
 
-		const Sound& GetEmitter(uint8_t playingID) const;
+		const Stream& GetEmitter(uint8_t playingID) const;
 
 		void RemoveEmitter(uint8_t playingID);
 
@@ -52,16 +49,16 @@ namespace Mix {
 		bool HasEmitters() const;
 
 	private:
-		bool RequeueAudioClip(const sf::Sound& sound, uint8_t playingID, float currentTime, Sound& soundData, std::set<AudioEventData>& event);
+		bool RequeueAudioClip(const Music& stream, uint8_t playingID, float currentTime, Stream& streamData, std::set<AudioEventData>& event);
 
-		void HandleInvalid(uint8_t playingID, const Sound& soundData, std::set<AudioEventData>& event);
+		void HandleInvalid(uint8_t playingID, const Stream& streamData, std::set<AudioEventData>& event);
 
 	private:
 		using EventIterator = std::set<AudioEventData>::iterator;
 
-		struct Sound
+		struct Stream
 		{
-			sf::Sound sound;
+			Music music;
 
 			uint64_t entity = 0;
 			EventIterator iterator;
@@ -70,14 +67,14 @@ namespace Mix {
 			float previousVolume = 0;
 			float previousTimeOffset = 0;
 
-			Sound(EventIterator event, uint64_t entity)
+			Stream(EventIterator event, uint64_t entity)
 					: entity(entity), iterator(event) { }
 
-			bool IsValid() const { return sound.getBuffer() != nullptr; }
+			bool IsValid() const { return music.GetReference() != nullptr; }
 		};
 
 	private:
-		std::unordered_map<uint8_t, Sound> m_CurrentPlayingAudio;
+		std::unordered_map<uint8_t, Stream> m_CurrentPlayingAudio;
 
 		static constexpr uint8_t c_InvalidAudioSource = 0;
 	};

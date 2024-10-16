@@ -1,14 +1,14 @@
 #include <catch2/catch_test_macros.hpp>
 #include <MaizeMix/MaizeMix.h>
 
-#include "MaizeMix/Audio/Data/SoundBuffer.h"
-#include "MaizeMix/Engine/EngineHandler/SoundHandler.h"
+#include "MaizeMix/Audio/Data/SoundReference.h"
+#include "MaizeMix/Engine/EngineHandler/StreamHandler.h"
 
-TEST_CASE("Playing", "[Sound]")
+TEST_CASE("Playing", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
-	Mix::SoundBuffer soundBuffer;
+	Mix::SoundReference soundBuffer;
 	soundBuffer.OpenFromFile("Clips/Pew.wav");
 
 	uint64_t entity = 12345;
@@ -21,11 +21,11 @@ TEST_CASE("Playing", "[Sound]")
 	REQUIRE(soundHandler.HasEmitter(audioSourceID) == true);
 }
 
-TEST_CASE("Pausing", "[Sound]")
+TEST_CASE("Pausing", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
-	Mix::SoundBuffer soundBuffer;
+	Mix::SoundReference soundBuffer;
 	soundBuffer.OpenFromFile("Clips/Pew.wav");
 
 	uint64_t entity = 12345;
@@ -40,11 +40,11 @@ TEST_CASE("Pausing", "[Sound]")
 	REQUIRE(soundHandler.HasEmitter(audioSourceID) == true);
 }
 
-TEST_CASE("Un-pausing", "[Sound]")
+TEST_CASE("Un-pausing", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
-	Mix::SoundBuffer soundBuffer;
+	Mix::SoundReference soundBuffer;
 	soundBuffer.OpenFromFile("Clips/Pew.wav");
 
 	uint64_t entity = 12345;
@@ -60,11 +60,11 @@ TEST_CASE("Un-pausing", "[Sound]")
 	REQUIRE(soundHandler.HasEmitter(audioSourceID) == true);
 }
 
-TEST_CASE("Stopping", "[Sound]")
+TEST_CASE("Stopping", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
-	Mix::SoundBuffer soundBuffer;
+	Mix::SoundReference soundBuffer;
 	soundBuffer.OpenFromFile("Clips/Pew.wav");
 
 	uint64_t entity = 12345;
@@ -81,11 +81,11 @@ TEST_CASE("Stopping", "[Sound]")
 	REQUIRE(soundHandler.HasEmitter(audioSourceID) == false);
 }
 
-TEST_CASE("Play, pause, unpause, and stop", "[Sound]")
+TEST_CASE("Play, pause, unpause, and stop", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
-	Mix::SoundBuffer soundBuffer;
+	Mix::SoundReference soundBuffer;
 	soundBuffer.OpenFromFile("Clips/Pew.wav");
 
 	uint64_t entity = 12345;
@@ -93,18 +93,21 @@ TEST_CASE("Play, pause, unpause, and stop", "[Sound]")
 
 	// play the audio clip
 	bool playResult = soundHandler.PlayClip(soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), entity, events, audioSourceID, 0.0f);
+
 	REQUIRE(playResult == true);
 	REQUIRE(events.size() == 1);
 	REQUIRE(soundHandler.HasEmitter(audioSourceID));
 
 	// pause the audio clip
 	bool pauseResult = soundHandler.PauseClip(audioSourceID, events);
+
 	REQUIRE(pauseResult == true);
 	REQUIRE(events.size() == 0);
 	REQUIRE(soundHandler.HasEmitter(audioSourceID));
 
 	// un-pause the audio clip
 	bool unpauseResult = soundHandler.UnPauseClip(audioSourceID, events, 0.0f);
+
 	REQUIRE(unpauseResult == true);
 	REQUIRE(events.size() == 1);
 	REQUIRE(soundHandler.HasEmitter(audioSourceID));
@@ -119,33 +122,35 @@ TEST_CASE("Play, pause, unpause, and stop", "[Sound]")
 	REQUIRE(!soundHandler.HasEmitter(audioSourceID));
 }
 
-TEST_CASE("Repeated PlayClip calls", "[Sound]")
+TEST_CASE("Repeated PlayClip calls", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
-	Mix::SoundBuffer soundBuffer;
+	Mix::SoundReference soundBuffer;
 	soundBuffer.OpenFromFile("Clips/Pew.wav");
 
 	uint64_t entity = 12345;
 	uint8_t audioSourceID = 1;
 
 	bool playResult = soundHandler.PlayClip(soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), entity, events, audioSourceID, 0.0f);
+
 	REQUIRE(playResult == true);
 	REQUIRE(events.size() == 1);
 	REQUIRE(soundHandler.HasEmitter(audioSourceID));
 
 	// should not alter state
 	playResult = soundHandler.PlayClip(soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), entity, events, audioSourceID, 0.0f);
+
 	REQUIRE(playResult == false);
 	REQUIRE(events.size() == 1);
 	REQUIRE(soundHandler.HasEmitter(audioSourceID));
 }
 
-TEST_CASE("Repeated PauseClip calls", "[Sound]")
+TEST_CASE("Repeated PauseClip calls", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
-	Mix::SoundBuffer soundBuffer;
+	Mix::SoundReference soundBuffer;
 	soundBuffer.OpenFromFile("Clips/Pew.wav");
 
 	uint64_t entity = 12345;
@@ -153,22 +158,24 @@ TEST_CASE("Repeated PauseClip calls", "[Sound]")
 	soundHandler.PlayClip(soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), entity, events, audioSourceID, 0.0f);
 
 	bool pauseResult = soundHandler.PauseClip(audioSourceID, events);
+
 	REQUIRE(pauseResult == true);
 	REQUIRE(events.size() == 0);
 	REQUIRE(soundHandler.HasEmitter(audioSourceID));
 
 	// should not alter state
 	pauseResult = soundHandler.PauseClip(audioSourceID, events);
+
 	REQUIRE(pauseResult == false);
 	REQUIRE(events.size() == 0);
 	REQUIRE(soundHandler.HasEmitter(audioSourceID));
 }
 
-TEST_CASE("Repeated UnPauseClip calls", "[Sound]")
+TEST_CASE("Repeated UnPauseClip calls", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
-	Mix::SoundBuffer soundBuffer;
+	Mix::SoundReference soundBuffer;
 	soundBuffer.OpenFromFile("Clips/Pew.wav");
 
 	uint64_t entity = 12345;
@@ -180,64 +187,68 @@ TEST_CASE("Repeated UnPauseClip calls", "[Sound]")
 
 	// first un-pause
 	bool unpauseResult = soundHandler.UnPauseClip(audioSourceID, events, 0.0f);
+
 	REQUIRE(unpauseResult == true);
 	REQUIRE(events.size() == 1);
 	REQUIRE(soundHandler.HasEmitter(audioSourceID));
 
 	// should not alter state
 	unpauseResult = soundHandler.UnPauseClip(audioSourceID, events, 0.0f);
+
 	REQUIRE(unpauseResult == false);
 	REQUIRE(events.size() == 1);
 	REQUIRE(soundHandler.HasEmitter(audioSourceID));
 }
 
-TEST_CASE("Pause invalid handling", "[Sound]")
+TEST_CASE("Pause invalid handling", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
 	uint64_t entity = 12345;
 	uint8_t audioSourceID = 1;
 
 	{
-		Mix::SoundBuffer soundBuffer;
+		Mix::SoundReference soundBuffer;
 		soundBuffer.OpenFromFile("Clips/Pew.wav");
 		soundHandler.PlayClip(soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), entity, events, audioSourceID, 0.0f);
 	}
 
 	bool pauseResult = soundHandler.PauseClip(audioSourceID, events);
+
 	REQUIRE(pauseResult == false);
 	REQUIRE(events.size() == 0);
 	REQUIRE(!soundHandler.HasEmitter(audioSourceID));
 }
 
-TEST_CASE("Un-pause invalid handling", "[Sound]")
+TEST_CASE("Unpause invalid handling", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
 	uint64_t entity = 12345;
 	uint8_t audioSourceID = 1;
 
 	{
-		Mix::SoundBuffer soundBuffer;
+		Mix::SoundReference soundBuffer;
 		soundBuffer.OpenFromFile("Clips/Pew.wav");
 		soundHandler.PlayClip(soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), entity, events, audioSourceID, 0.0f);
 	}
 
 	bool unpauseResult = soundHandler.UnPauseClip(audioSourceID, events, 0.0f);
+
 	REQUIRE(unpauseResult == false);
 	REQUIRE(events.size() == 0);
 	REQUIRE(!soundHandler.HasEmitter(audioSourceID));
 }
 
-TEST_CASE("Stop invalid handling", "[Sound]")
+TEST_CASE("Stop invalid handling", "[Stream]")
 {
-	Mix::SoundHandler soundHandler;
+	Mix::StreamHandler soundHandler;
 	std::set<Mix::AudioEventData> events;
 	uint64_t entity = 12345;
 	uint8_t audioSourceID = 1;
 
 	{
-		Mix::SoundBuffer soundBuffer;
+		Mix::SoundReference soundBuffer;
 		soundBuffer.OpenFromFile("Clips/Pew.wav");
 		soundHandler.PlayClip(soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), entity, events, audioSourceID, 0.0f);
 	}
