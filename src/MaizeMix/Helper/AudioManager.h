@@ -4,10 +4,9 @@
 #include <string>
 #include <memory>
 
-#include "MaizeMix/Audio/Data/Clip.h"
-
 namespace Mix {
 
+    class Clip;
     class AudioClip;
 
     class AudioManager

@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
-#include <MaizeMix/MaizeMix.h>
+#include <MaizeMix.h>
 
-#include "MaizeMix/Audio/Data/SoundReference.h"
-#include "MaizeMix/Engine/EngineHandler/StreamHandler.h"
+#include "MaizeMix/Streaming/SoundReference.h"
+#include "MaizeMix/Streaming/StreamHandler.h"
 
 TEST_CASE("Playing", "[Stream]")
 {

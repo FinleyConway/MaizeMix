@@ -1,10 +1,10 @@
-#include "MaizeMix/Engine/EngineHandler/SoundHandler.h"
+#include "MaizeMix/Sounds/SoundHandler.h"
 
 #include <limits>
 
-#include "MaizeMix/Engine/EngineHandler/SoundData.h"
-#include "MaizeMix/Audio/Data/SoundBuffer.h"
-#include "MaizeMix/Audio/AudioClip.h"
+#include "MaizeMix/Helper/SoundData.h"
+#include "MaizeMix/Sounds/SoundBuffer.h"
+#include "MaizeMix/AudioClip.h"
 
 namespace Mix {
 

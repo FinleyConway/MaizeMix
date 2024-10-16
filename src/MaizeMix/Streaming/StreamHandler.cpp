@@ -1,4 +1,4 @@
-#include "MaizeMix/Engine/EngineHandler/StreamHandler.h"
+#include "MaizeMix/Streaming/StreamHandler.h"
 
 #include <limits>
 

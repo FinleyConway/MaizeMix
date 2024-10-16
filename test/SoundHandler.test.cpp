@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
-#include <MaizeMix/MaizeMix.h>
+#include <MaizeMix.h>
 
-#include "MaizeMix/Audio/Data/SoundBuffer.h"
-#include "MaizeMix/Engine/EngineHandler/SoundHandler.h"
+#include "MaizeMix/Sounds/SoundBuffer.h"
+#include "MaizeMix/Sounds/SoundHandler.h"
 
 TEST_CASE("Playing", "[Sound]")
 {

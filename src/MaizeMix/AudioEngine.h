@@ -2,15 +2,14 @@
 
 #include <SFML/Audio.hpp>
 
-#include <unordered_map>
 #include <functional>
 #include <memory>
 #include <set>
 
-#include "AudioManager.h"
-#include "EngineHandler/SoundHandler.h"
-#include "MaizeMix/Audio/AudioClip.h"
-#include "MaizeMix/Engine/EngineHandler/SoundData.h"
+#include "MaizeMix/Helper/AudioManager.h"
+#include "MaizeMix/Sounds/SoundHandler.h"
+#include "MaizeMix/Helper/SoundData.h"
+#include "MaizeMix/AudioClip.h"
 
 namespace Mix {
 

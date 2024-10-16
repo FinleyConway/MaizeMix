@@ -2,7 +2,7 @@
 
 #include <SFML/Audio.hpp>
 
-#include "MaizeMix/Audio/Data/Clip.h"
+#include "MaizeMix/Helper/Clip.h"
 
 namespace Mix {
 

@@ -1,5 +1,5 @@
-#include "MaizeMix/Audio/Data/SoundReference.h"
-#include "MaizeMix/Audio/Music.h"
+#include "MaizeMix/Streaming/SoundReference.h"
+#include "MaizeMix/Streaming/Music.h"
 
 namespace Mix {
 

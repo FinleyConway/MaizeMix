@@ -1,4 +1,4 @@
-#include "MaizeMix/Audio/Data/SoundBuffer.h"
+#include "MaizeMix/Sounds/SoundBuffer.h"
 
 namespace Mix {
 

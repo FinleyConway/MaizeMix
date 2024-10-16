@@ -21,27 +21,28 @@ else()
 endif()
 
 add_library(MaizeMix ${LIB_TYPE}
-        src/MaizeMix/Audio/Data/Clip.h
-        src/MaizeMix/Audio/Data/SoundBuffer.cpp
-        src/MaizeMix/Audio/Data/SoundBuffer.h
-        src/MaizeMix/Audio/Data/SoundReference.cpp
-        src/MaizeMix/Audio/Data/SoundReference.h
+        src/MaizeMix/Helper/Clip.h
+        src/MaizeMix/Helper/SoundData.h
+        src/MaizeMix/Helper/AudioManager.cpp
+        src/MaizeMix/Helper/AudioManager.h
 
-        src/MaizeMix/Audio/Music.cpp
-        src/MaizeMix/Audio/Music.h
-        src/MaizeMix/Audio/AudioClip.cpp
-        src/MaizeMix/Audio/AudioClip.h
+        src/MaizeMix/Sounds/SoundHandler.cpp
+        src/MaizeMix/Sounds/SoundHandler.h
+        src/MaizeMix/Sounds/SoundBuffer.cpp
+        src/MaizeMix/Sounds/SoundBuffer.h
 
-        src/MaizeMix/Engine/EngineHandler/SoundHandler.cpp
-        src/MaizeMix/Engine/EngineHandler/SoundHandler.h
-        src/MaizeMix/Engine/EngineHandler/StreamHandler.cpp
-        src/MaizeMix/Engine/EngineHandler/StreamHandler.h
-        src/MaizeMix/Engine/EngineHandler/SoundData.h
+        src/MaizeMix/Streaming/StreamHandler.cpp
+        src/MaizeMix/Streaming/SoundReference.h
+        src/MaizeMix/Streaming/SoundReference.cpp
+        src/MaizeMix/Streaming/StreamHandler.h
+        src/MaizeMix/Streaming/Music.cpp
+        src/MaizeMix/Streaming/Music.h
 
-        src/MaizeMix/Engine/AudioEngine.cpp
-        src/MaizeMix/Engine/AudioFinishCallback.h
-        src/MaizeMix/Engine/AudioManager.cpp
-        src/MaizeMix/Engine/AudioManager.h
+        src/MaizeMix/AudioClip.cpp
+        src/MaizeMix/AudioClip.h
+        src/MaizeMix/AudioEngine.cpp
+        src/MaizeMix/AudioEngine.h
+        src/MaizeMix.h
 )
 
 target_include_directories(MaizeMix PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

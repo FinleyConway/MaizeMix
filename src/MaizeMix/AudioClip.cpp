@@ -1,4 +1,4 @@
-#include "MaizeMix/Audio/AudioClip.h"
+#include "MaizeMix/AudioClip.h"
 
 namespace Mix {
 

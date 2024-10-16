@@ -5,9 +5,9 @@
 #include <functional>
 #include <unordered_map>
 
-#include "MaizeMix/Audio/Music.h"
-#include "MaizeMix/Audio/Data/SoundReference.h"
-#include "MaizeMix/Engine/EngineHandler/SoundData.h"
+#include "MaizeMix/Streaming/Music.h"
+#include "MaizeMix/Streaming/SoundReference.h"
+#include "MaizeMix/Helper/SoundData.h"
 
 namespace Mix {
 

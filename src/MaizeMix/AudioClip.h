@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "MaizeMix/Audio/Data/Clip.h"
+#include "MaizeMix/Helper/Clip.h"
 
 namespace Mix {
 
