@@ -14,6 +14,23 @@ option(MIX_BUILD_SANDBOX "Build sandbox project" OFF)
 
 # import sfml
 FetchContent_Declare(sfml GIT_REPOSITORY https://github.com/SFML/SFML.git GIT_TAG 2.6.1)
+
+if (MIX_BUILD_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS ON)
+endif ()
+
+if (MIX_BUILD_SANDBOX)
+    set(SFML_BUILD_WINDOW ON)
+    set(SFML_BUILD_GRAPHICS ON)
+    set(SFML_BUILD_NETWORK OFF)
+else ()
+    set(SFML_BUILD_WINDOW OFF)
+    set(SFML_BUILD_GRAPHICS OFF)
+    set(SFML_BUILD_NETWORK OFF)
+endif ()
+
+set(SFML_BUILD_AUDIO ON)
+
 FetchContent_MakeAvailable(sfml)
 
 # build it as a static or shared library

@@ -20,9 +20,10 @@ namespace Mix {
 			m_CurrentPlayingAudio.try_emplace(entityID, it, entityID);
 
 			auto& sound = m_CurrentPlayingAudio.at(entityID).sound;
+
 			sound.setBuffer(clip.GetBuffer());
-			sound.setVolume(std::clamp(specification.volume, 0.0f, 100.0f));
-			sound.setPitch(specification.pitch);
+			sound.setVolume(specification.mute ? 0.0f :std::clamp(specification.volume, 0.0f, 100.0f));
+			sound.setPitch(std::max(0.0001f, specification.pitch));
 			sound.setLoop(specification.loop);
 			sound.setPosition(specification.x, specification.y, specification.depth);
 			sound.setMinDistance(specification.minDistance);
@@ -139,6 +140,7 @@ namespace Mix {
 
 		if (soundData.IsValid())
 		{
+			soundData.previousVolume = soundData.sound.getVolume();
 			soundData.sound.setVolume(std::clamp(volume, 0.0f, 100.0f));
 
 			return true;
@@ -153,7 +155,7 @@ namespace Mix {
 
 		if (soundData.IsValid())
 		{
-			soundData.sound.setPitch(pitch);
+			soundData.sound.setPitch(std::max(0.0001f, pitch));
 
 			return true;
 		}
@@ -267,7 +269,7 @@ namespace Mix {
 		const float duration = sound.getBuffer()->getDuration().asSeconds();
 		const float playingOffset = sound.getPlayingOffset().asSeconds();
 		const float playingTimeLeft = duration - playingOffset;
-		const float stopTime = currentTime + playingTimeLeft;
+		const float stopTime = sound.getLoop() ? std::numeric_limits<float>::max() : currentTime + playingTimeLeft;
 
 		// remove existing event to avoid duplicates
 		if (event.contains(*soundData.iterator)) event.erase(soundData.iterator);

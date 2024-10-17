@@ -17,8 +17,8 @@ namespace Mix {
 			auto& stream = m_CurrentPlayingAudio.at(entityID).music;
 
 			if (!stream.Load(clip)) return false; // since this is a wrapper to make it act like sf::Sound we have to load it
-			stream.SetVolume(std::clamp(specification.volume, 0.0f, 100.0f));
-			stream.SetPitch(specification.pitch);
+			stream.SetVolume(specification.mute ? 0.0f :std::clamp(specification.volume, 0.0f, 100.0f));
+			stream.SetPitch(std::max(0.0001f, specification.pitch));
 			stream.SetLoop(specification.loop);
 			stream.SetPosition(specification.x, specification.y, specification.depth);
 			stream.SetMinDistance(specification.minDistance);
@@ -112,13 +112,11 @@ namespace Mix {
 	bool StreamHandler::SetMuteState(uint64_t entityID, bool mute)
 	{
 		auto& streamData = m_CurrentPlayingAudio.at(entityID);
-		const float volume = mute ? 0.0f : streamData.previousVolume;
+		const float volume = mute ? 0.0f : streamData.music.GetVolume();
 
-		// check to see if it's either a music clip or sound effect clip
 		if (streamData.IsValid())
 		{
 			streamData.isMute = mute;
-			streamData.previousVolume = streamData.music.GetVolume();
 			streamData.music.SetVolume(volume);
 
 			return true;
@@ -149,7 +147,7 @@ namespace Mix {
 
 		if (streamData.IsValid())
 		{
-			streamData.music.SetPitch(pitch);
+			streamData.music.SetPitch(std::max(0.0001f, pitch));
 
 			return true;
 		}
@@ -261,7 +259,7 @@ namespace Mix {
 		const float duration = stream.GetReference()->GetDuration().asSeconds();
 		const float playingOffset = stream.GetPlayingOffset().asSeconds();
 		const float playingTimeLeft = duration - playingOffset;
-		const float stopTime = currentTime + playingTimeLeft;
+		const float stopTime = stream.GetLoop() ? std::numeric_limits<float>::max() : currentTime + playingTimeLeft;
 
 		// remove existing event to avoid duplicates
 		if (event.contains(*streamData.iterator)) event.erase(streamData.iterator);

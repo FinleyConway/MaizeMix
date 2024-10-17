@@ -28,6 +28,7 @@ namespace Mix {
 
 	struct AudioSpecification
 	{
+		bool mute = false;
 		bool loop = false;
 		float volume = 0.0f;
 		float pitch = 0.0f;
@@ -40,8 +41,8 @@ namespace Mix {
 		float maxDistance = 0.0f;
 
 		AudioSpecification() = default;
-		AudioSpecification(bool loop, float volume, float pitch, float x, float y, float depth, float minDistance, float maxDistance)
-			: loop(loop), volume(volume), pitch(pitch), x(x), y(y), depth(depth), minDistance(minDistance), maxDistance(maxDistance)
+		AudioSpecification(bool loop, bool mute, float volume, float pitch, float x, float y, float depth, float minDistance, float maxDistance)
+			: mute(mute), loop(loop), volume(volume), pitch(pitch), x(x), y(y), depth(depth), minDistance(minDistance), maxDistance(maxDistance)
 		{
 		}
 	};
