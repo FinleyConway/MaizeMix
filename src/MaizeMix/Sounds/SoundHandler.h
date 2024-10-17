@@ -67,7 +67,6 @@ namespace Mix {
 			EventIterator iterator;
 
 			bool isMute = false;
-			float previousVolume = 0;
 			float previousTimeOffset = 0;
 
 			Sound(EventIterator event, uint64_t entity)

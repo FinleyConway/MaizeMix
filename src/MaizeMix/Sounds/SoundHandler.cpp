@@ -117,13 +117,12 @@ namespace Mix {
 	bool SoundHandler::SetMuteState(uint64_t entityID, bool mute)
 	{
 		auto& soundData = m_CurrentPlayingAudio.at(entityID);
-		const float volume = mute ? 0.0f : soundData.previousVolume;
+		const float volume = mute ? 0.0f : soundData.sound.getVolume();;
 
 		// check to see if it's either a music clip or sound effect clip
 		if (soundData.IsValid())
 		{
 			soundData.isMute = mute;
-			soundData.previousVolume = soundData.sound.getVolume();
 			soundData.sound.setVolume(volume);
 
 			return true;
@@ -140,7 +139,6 @@ namespace Mix {
 
 		if (soundData.IsValid())
 		{
-			soundData.previousVolume = soundData.sound.getVolume();
 			soundData.sound.setVolume(std::clamp(volume, 0.0f, 100.0f));
 
 			return true;
