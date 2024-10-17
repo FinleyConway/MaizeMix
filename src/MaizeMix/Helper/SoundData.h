@@ -6,12 +6,12 @@ namespace Mix {
 
 	struct AudioEventData
 	{
-		const uint8_t playingID = 0;
+		const uint64_t entityID = 0;
 		const float stopTime = 0;
 
 		AudioEventData() = default;
-		AudioEventData(uint8_t playingID, float stopTime)
-			: playingID(playingID), stopTime(stopTime)
+		AudioEventData(uint64_t entityID, float stopTime)
+			: entityID(entityID), stopTime(stopTime)
 		{
 		}
 
@@ -19,7 +19,7 @@ namespace Mix {
 		{
 			if (stopTime == other.stopTime)
 			{
-				return playingID < other.playingID;
+				return entityID < other.entityID;
 			}
 
 			return stopTime < other.stopTime;

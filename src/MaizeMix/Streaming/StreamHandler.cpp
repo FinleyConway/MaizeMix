@@ -4,17 +4,17 @@
 
 namespace Mix {
 
-	bool StreamHandler::PlayClip(const SoundReference& clip, const AudioSpecification& specification, uint64_t entity, std::set<AudioEventData>& event, uint8_t audioSourceID, float currentTime)
+	bool StreamHandler::PlayClip(uint64_t entityID, const SoundReference& clip, const AudioSpecification& specification, std::set<AudioEventData>& event, float currentTime)
 	{
 		const float stopTime = specification.loop ? std::numeric_limits<float>::max() : currentTime + clip.GetDuration().asSeconds();
-		const auto& [it, successful] = event.emplace(audioSourceID, stopTime);
+		const auto& [it, successful] = event.emplace(entityID, stopTime);
 
 		if (successful)
 		{
 			// construct audio source and play it
-			m_CurrentPlayingAudio.try_emplace(audioSourceID, it, entity);
+			m_CurrentPlayingAudio.try_emplace(entityID, it, entityID);
 
-			auto& stream = m_CurrentPlayingAudio.at(audioSourceID).music;
+			auto& stream = m_CurrentPlayingAudio.at(entityID).music;
 
 			if (!stream.Load(clip)) return false; // since this is a wrapper to make it act like sf::Sound we have to load it
 			stream.SetVolume(std::clamp(specification.volume, 0.0f, 100.0f));
@@ -32,9 +32,9 @@ namespace Mix {
 		return false;
 	}
 
-	bool StreamHandler::PauseClip(uint8_t playingID, std::set<AudioEventData>& event)
+	bool StreamHandler::PauseClip(uint64_t entityID, std::set<AudioEventData>& event)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 
 		if (streamData.IsValid())
 		{
@@ -48,27 +48,27 @@ namespace Mix {
 		}
 		else
 		{
-			HandleInvalid(playingID, streamData, event);
+			HandleInvalid(entityID, streamData, event);
 		}
 
 		return false;
 	}
 
-	bool StreamHandler::UnPauseClip(uint8_t playingID, std::set<AudioEventData>& event, float currentTime)
+	bool StreamHandler::UnPauseClip(uint64_t entityID, std::set<AudioEventData>& event, float currentTime)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 		auto& stream = streamData.music;
 
 		if (streamData.IsValid() && stream.GetStatus() == sf::SoundSource::Paused)
 		{
 			stream.Play();
 
-			return RequeueAudioClip(stream, playingID, currentTime, streamData, event);
+			return RequeueAudioClip(entityID, stream, currentTime, streamData, event);
 		}
 
 		if (!streamData.IsValid())
 		{
-			HandleInvalid(playingID, streamData, event);
+			HandleInvalid(entityID, streamData, event);
 
 			return false;
 		}
@@ -76,23 +76,23 @@ namespace Mix {
 		return false;
 	}
 
-	void StreamHandler::StopClip(uint8_t playingID, std::set<AudioEventData>& event, const std::function<void(uint8_t, uint64_t)>& onAudioFinish)
+	void StreamHandler::StopClip(uint64_t entityID, std::set<AudioEventData>& event, const std::function<void(uint64_t)>& onAudioFinish)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 
 		// if only the audio is still valid
 		if (streamData.IsValid()) streamData.music.Stop();
 
 		// trigger event handle any outside finished logic
-		onAudioFinish(playingID, streamData.entity);
+		onAudioFinish(streamData.entity);
 
 		// despite the name, just removes it
-		HandleInvalid(playingID, streamData, event);
+		HandleInvalid(entityID, streamData, event);
 	}
 
-	bool StreamHandler::SetLoopState(uint8_t playingID, std::set<AudioEventData>& event, float currentTime, bool loop)
+	bool StreamHandler::SetLoopState(uint64_t entityID, std::set<AudioEventData>& event, float currentTime, bool loop)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 		auto& stream = streamData.music;
 
 		if (streamData.IsValid())
@@ -100,15 +100,15 @@ namespace Mix {
 			if (stream.GetLoop() == loop) return false; // leave function if the same state
 			stream.SetLoop(loop);
 
-			return RequeueAudioClip(stream, playingID, currentTime, streamData, event);
+			return RequeueAudioClip(entityID, stream, currentTime, streamData, event);
 		}
 
 		return false;
 	}
 
-	bool StreamHandler::SetMuteState(uint8_t playingID, bool mute)
+	bool StreamHandler::SetMuteState(uint64_t entityID, bool mute)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 		const float volume = mute ? 0.0f : streamData.previousVolume;
 
 		// check to see if it's either a music clip or sound effect clip
@@ -124,9 +124,9 @@ namespace Mix {
 		return false;
 	}
 
-	bool StreamHandler::SetVolume(uint8_t playingID, float volume)
+	bool StreamHandler::SetVolume(uint64_t entityID, float volume)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 
 		if (streamData.isMute) return false;
 
@@ -140,9 +140,9 @@ namespace Mix {
 		return false;
 	}
 
-	bool StreamHandler::SetPitch(uint8_t playingID, float pitch)
+	bool StreamHandler::SetPitch(uint64_t entityID, float pitch)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 
 		if (streamData.IsValid())
 		{
@@ -154,9 +154,9 @@ namespace Mix {
 		return false;
 	}
 
-	bool StreamHandler::SetPosition(uint8_t playingID, float x, float y, float depth, float minDistance, float maxDistance)
+	bool StreamHandler::SetPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 		auto& stream = streamData.music;
 
 		if (streamData.IsValid())
@@ -175,9 +175,9 @@ namespace Mix {
 		return false;
 	}
 
-	bool StreamHandler::SetSpatialState(uint8_t playingID, bool isSpatial)
+	bool StreamHandler::SetSpatialState(uint64_t entityID, bool isSpatial)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 		auto& stream = streamData.music;
 
 		if (streamData.IsValid())
@@ -198,9 +198,9 @@ namespace Mix {
 		return false;
 	}
 
-	bool StreamHandler::SetAudioOffsetTime(uint8_t playingID, std::set<AudioEventData>& event, float currentTime, float time)
+	bool StreamHandler::SetAudioOffsetTime(uint64_t entityID, std::set<AudioEventData>& event, float currentTime, float time)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 		auto& stream = streamData.music;
 
 		if (streamData.IsValid())
@@ -210,15 +210,15 @@ namespace Mix {
 
 			stream.SetPlayingOffset(time);
 
-			return RequeueAudioClip(stream, playingID, currentTime, streamData, event);
+			return RequeueAudioClip(entityID, stream, currentTime, streamData, event);
 		}
 
 		return false;
 	}
 
-	float StreamHandler::GetAudioOffsetTime(uint8_t playingID)
+	float StreamHandler::GetAudioOffsetTime(uint64_t entityID)
 	{
-		auto& streamData = m_CurrentPlayingAudio.at(playingID);
+		auto& streamData = m_CurrentPlayingAudio.at(entityID);
 
 		if (streamData.IsValid())
 		{
@@ -232,19 +232,19 @@ namespace Mix {
 		return 0.0f;
 	}
 
-	const StreamHandler::Stream& StreamHandler::GetEmitter(uint8_t playingID) const
+	const StreamHandler::Stream& StreamHandler::GetEmitter(uint64_t entityID) const
 	{
-		return m_CurrentPlayingAudio.at(playingID);
+		return m_CurrentPlayingAudio.at(entityID);
 	}
 
-	void StreamHandler::RemoveEmitter(uint8_t playingID)
+	void StreamHandler::RemoveEmitter(uint64_t entityID)
 	{
-		m_CurrentPlayingAudio.erase(playingID);
+		m_CurrentPlayingAudio.erase(entityID);
 	}
 
-	bool StreamHandler::HasEmitter(uint8_t playingID) const
+	bool StreamHandler::HasEmitter(uint64_t entityID) const
 	{
-		return m_CurrentPlayingAudio.contains(playingID);
+		return m_CurrentPlayingAudio.contains(entityID);
 	}
 
 	bool StreamHandler::HasEmitters() const
@@ -252,7 +252,7 @@ namespace Mix {
 		return !m_CurrentPlayingAudio.empty();
 	}
 
-	bool StreamHandler::RequeueAudioClip(const Music& stream, uint8_t playingID, float currentTime, Stream& streamData, std::set<AudioEventData>& event)
+	bool StreamHandler::RequeueAudioClip(uint64_t entityID, const Music& stream, float currentTime, Stream& streamData, std::set<AudioEventData>& event)
 	{
 		// calculate the remaining play time
 		const float duration = stream.GetReference()->GetDuration().asSeconds();
@@ -264,7 +264,7 @@ namespace Mix {
 		if (event.contains(*streamData.iterator)) event.erase(streamData.iterator);
 
 		// attempt to reinsert with new stop time
-		const auto [it, successful] = event.emplace(playingID, stopTime);
+		const auto [it, successful] = event.emplace(entityID, stopTime);
 		if (successful)
 		{
 			streamData.iterator = it;
@@ -274,7 +274,7 @@ namespace Mix {
 		return false;
 	}
 
-	void StreamHandler::HandleInvalid(uint8_t playingID, const Stream& streamData, std::set<AudioEventData>& event)
+	void StreamHandler::HandleInvalid(uint64_t entityID, const Stream& streamData, std::set<AudioEventData>& event)
 	{
 
 		if (event.contains(*streamData.iterator))
@@ -282,9 +282,9 @@ namespace Mix {
 			event.erase(streamData.iterator);
 		}
 
-		if (m_CurrentPlayingAudio.contains(playingID))
+		if (m_CurrentPlayingAudio.contains(entityID))
 		{
-			m_CurrentPlayingAudio.erase(playingID);
+			m_CurrentPlayingAudio.erase(entityID);
 		}
 	}
 

@@ -1,3 +1,5 @@
+# MaizeMix
+
 cmake_minimum_required(VERSION 3.27)
 project(MaizeMix)
 
@@ -8,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(MIX_BUILD_SHARED_LIBS "Build Maize Mix as a shared library" OFF)
 option(MIX_BUILD_TEST "Build test project" OFF)
+option(MIX_BUILD_SANDBOX "Build sandbox project" OFF)
 
 # import sfml
 FetchContent_Declare(sfml GIT_REPOSITORY https://github.com/SFML/SFML.git GIT_TAG 2.6.1)
@@ -51,4 +54,9 @@ target_link_libraries(MaizeMix PUBLIC sfml-audio)
 # add test directory if tests are enabled
 if (NOT MIX_BUILD_SHARED_LIBS AND MIX_BUILD_TEST)
     add_subdirectory(test)
+endif()
+
+# add sandbox directory if sandbox are enabled
+if (NOT MIX_BUILD_SHARED_LIBS AND MIX_BUILD_SANDBOX)
+    add_subdirectory(sandbox)
 endif()

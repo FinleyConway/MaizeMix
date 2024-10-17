@@ -19,42 +19,42 @@ namespace Mix {
 	struct Sound;
 
 	public:
-		bool PlayClip(const SoundBuffer& clip, const AudioSpecification& specification, uint64_t entity, std::set<AudioEventData>& event, uint8_t audioSourceID, float currentTime);
+		bool PlayClip(uint64_t entityID, const SoundBuffer& clip, const AudioSpecification& specification, std::set<AudioEventData>& event, float currentTime);
 
-		bool PauseClip(uint8_t playingID, std::set<AudioEventData>& event);
+		bool PauseClip(uint64_t entityID, std::set<AudioEventData>& event);
 
-		bool UnPauseClip(uint8_t playingID, std::set<AudioEventData>& event, float currentTime);
+		bool UnPauseClip(uint64_t entityID, std::set<AudioEventData>& event, float currentTime);
 
-		void StopClip(uint8_t playingID, std::set<AudioEventData>& event, const std::function<void(uint8_t, uint64_t)>& onAudioFinish);
+		void StopClip(uint64_t entityID, std::set<AudioEventData>& event, const std::function<void(uint64_t)>& onAudioFinish);
 
-		bool SetLoopState(uint8_t playingID, std::set<AudioEventData>& event, float currentTime, bool loop);
+		bool SetLoopState(uint64_t entityID, std::set<AudioEventData>& event, float currentTime, bool loop);
 
-		bool SetMuteState(uint8_t playingID, bool mute);
+		bool SetMuteState(uint64_t entityID, bool mute);
 
-		bool SetVolume(uint8_t playingID, float volume);
+		bool SetVolume(uint64_t entityID, float volume);
 
-		bool SetPitch(uint8_t playingID, float pitch);
+		bool SetPitch(uint64_t entityID, float pitch);
 
-		bool SetPosition(uint8_t playingID, float x, float y, float depth, float minDistance, float maxDistance);
+		bool SetPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance);
 
-		bool SetSpatialState(uint8_t playingID, bool isSpatial);
+		bool SetSpatialState(uint64_t entityID, bool isSpatial);
 
-		bool SetAudioOffsetTime(uint8_t playingID, std::set<AudioEventData>& event, float currentTime, float time);
+		bool SetAudioOffsetTime(uint64_t entityID, std::set<AudioEventData>& event, float currentTime, float time);
 
-		float GetAudioOffsetTime(uint8_t playingID);
+		float GetAudioOffsetTime(uint64_t entityID);
 
-		const Sound& GetEmitter(uint8_t playingID) const;
+		const Sound& GetEmitter(uint64_t entityID) const;
 
-		void RemoveEmitter(uint8_t playingID);
+		void RemoveEmitter(uint64_t entityID);
 
-		bool HasEmitter(uint8_t playingID) const;
+		bool HasEmitter(uint64_t entityID) const;
 
 		bool HasEmitters() const;
 
 	private:
-		bool RequeueAudioClip(const sf::Sound& sound, uint8_t playingID, float currentTime, Sound& soundData, std::set<AudioEventData>& event);
+		bool RequeueAudioClip(uint64_t entityID, const sf::Sound& sound, float currentTime, Sound& soundData, std::set<AudioEventData>& event);
 
-		void HandleInvalid(uint8_t playingID, const Sound& soundData, std::set<AudioEventData>& event);
+		void HandleInvalid(uint64_t entityID, const Sound& soundData, std::set<AudioEventData>& event);
 
 	private:
 		using EventIterator = std::set<AudioEventData>::iterator;
@@ -77,9 +77,7 @@ namespace Mix {
 		};
 
 	private:
-		std::unordered_map<uint8_t, Sound> m_CurrentPlayingAudio;
-
-		static constexpr uint8_t c_InvalidAudioSource = 0;
+		std::unordered_map<uint64_t, Sound> m_CurrentPlayingAudio;
 	};
 
 } // Mix
