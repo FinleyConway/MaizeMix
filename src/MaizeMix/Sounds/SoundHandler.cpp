@@ -88,7 +88,10 @@ namespace Mix {
 		if (soundData.IsValid()) soundData.sound.stop();
 
 		// trigger event handle any outside finished logic
-		onAudioFinish(soundData.entity);
+		if (onAudioFinish)
+		{
+			onAudioFinish(soundData.entity);
+		}
 
 		// despite the name, just removes it
 		HandleInvalid(entityID, soundData, event);

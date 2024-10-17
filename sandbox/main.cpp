@@ -30,7 +30,11 @@ void OnAudioSourcePlay(flecs::entity entity, AudioSourcePlay)
 	if (const auto* source = entity.get_mut<AudioSource>())
 	{
 		const auto spec = Mix::AudioSpecification(
-			false, 100, 1, 0, 0, 0, 0, 0
+			source->loop,
+			source->volume,
+			source->pitch,
+			0, 0, 0,
+			0, 0
 		);
 
 		context->engine->PlayAudio(entity.id(), source->clip, spec);
@@ -45,10 +49,7 @@ void OnAudioSourceStop(flecs::entity entity, AudioSourceStop)
 {
 	const auto* context = entity.world().get<AudioContext>();
 
-	if (entity.has<AudioSourcePlaying>())
-	{
-		context->engine->StopAudio(entity);
-	}
+	context->engine->StopAudio(entity);
 
 	entity.remove<AudioSourceStop>();
 }
@@ -84,12 +85,13 @@ int main()
 	});
 
 	world.observer<AudioSourcePlay>().event(flecs::OnAdd).each(OnAudioSourcePlay);
+	world.observer<AudioSourceStop>().event(flecs::OnAdd).each(OnAudioSourceStop);
 	world.system<AudioSource, const AudioSourcePlaying>().each(UpdatePlayingAudio);
 
 	world.set(AudioContext(&engine));
 
 	auto entity = world.entity()
-		.set(AudioSource(sound));
+		.set(AudioSource(stream));
 
 	sf::Clock clock;
 
@@ -108,6 +110,10 @@ int main()
 				if (event.key.code == sf::Keyboard::Space)
 				{
 					entity.add<AudioSourcePlay>();
+				}
+				else if (event.key.code == sf::Keyboard::LControl)
+				{
+					entity.add<AudioSourceStop>();
 				}
 			}
 		}

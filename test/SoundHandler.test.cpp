@@ -13,7 +13,7 @@ TEST_CASE("Playing", "[Sound]")
 
 	uint64_t entity = 12345;
 
-	bool result = soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+	bool result = soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 
 	REQUIRE(result == true);
 	REQUIRE(events.size() == 1);
@@ -29,7 +29,7 @@ TEST_CASE("Pausing", "[Sound]")
 
 	uint64_t entity = 12345;
 
-	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 
 	bool pause = soundHandler.PauseClip(entity, events);
 
@@ -47,7 +47,7 @@ TEST_CASE("Un-pausing", "[Sound]")
 
 	uint64_t entity = 12345;
 
-	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 	soundHandler.PauseClip(entity, events);
 
 	bool unpause = soundHandler.UnPauseClip(entity, events, 0.0f);
@@ -66,7 +66,7 @@ TEST_CASE("Stopping", "[Sound]")
 
 	uint64_t entity = 12345;
 
-	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 
 	soundHandler.StopClip(entity, events, [&](uint64_t e) {
 		REQUIRE(entity == e);
@@ -86,7 +86,7 @@ TEST_CASE("Play, pause, unpause, and stop", "[Sound]")
 	uint64_t entity = 12345;
 
 	// play the audio clip
-	bool playResult = soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+	bool playResult = soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 	REQUIRE(playResult == true);
 	REQUIRE(events.size() == 1);
 	REQUIRE(soundHandler.HasEmitter(entity));
@@ -121,13 +121,13 @@ TEST_CASE("Repeated PlayClip calls", "[Sound]")
 
 	uint64_t entity = 12345;
 
-	bool playResult = soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+	bool playResult = soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 	REQUIRE(playResult == true);
 	REQUIRE(events.size() == 1);
 	REQUIRE(soundHandler.HasEmitter(entity));
 
 	// should not alter state
-	playResult = soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+	playResult = soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 	REQUIRE(playResult == false);
 	REQUIRE(events.size() == 1);
 	REQUIRE(soundHandler.HasEmitter(entity));
@@ -142,7 +142,7 @@ TEST_CASE("Repeated PauseClip calls", "[Sound]")
 
 	uint64_t entity = 12345;
 
-	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 
 	bool pauseResult = soundHandler.PauseClip(entity, events);
 	REQUIRE(pauseResult == true);
@@ -165,7 +165,7 @@ TEST_CASE("Repeated UnPauseClip calls", "[Sound]")
 
 	uint64_t entity = 12345;
 
-	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+	soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 
 	// pause before un-pausing
 	soundHandler.PauseClip(entity, events);
@@ -192,7 +192,7 @@ TEST_CASE("Pause invalid handling", "[Sound]")
 	{
 		Mix::SoundBuffer soundBuffer;
 		soundBuffer.OpenFromFile("Clips/Pew.wav");
-		soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+		soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 	}
 
 	bool pauseResult = soundHandler.PauseClip(entity, events);
@@ -210,7 +210,7 @@ TEST_CASE("Un-pause invalid handling", "[Sound]")
 	{
 		Mix::SoundBuffer soundBuffer;
 		soundBuffer.OpenFromFile("Clips/Pew.wav");
-		soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+		soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 	}
 
 	bool unpauseResult = soundHandler.UnPauseClip(entity, events, 0.0f);
@@ -228,7 +228,7 @@ TEST_CASE("Stop invalid handling", "[Sound]")
 	{
 		Mix::SoundBuffer soundBuffer;
 		soundBuffer.OpenFromFile("Clips/Pew.wav");
-		soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 50, 1, 0, 0, 0, 5, 10), events, 0.0f);
+		soundHandler.PlayClip(entity, soundBuffer, Mix::AudioSpecification(false, 0, 1, 0, 0, 0, 5, 10), events, 0.0f);
 	}
 
 	soundHandler.StopClip(entity, events, [&](uint64_t e)

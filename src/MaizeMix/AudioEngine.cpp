@@ -40,124 +40,158 @@ namespace Mix {
 		return false;
 	}
 
-	void AudioEngine::PauseAudio(uint64_t entityID)
+	bool AudioEngine::PauseAudio(uint64_t entityID)
 	{
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
-			m_SoundHandler.PauseClip(entityID, m_AudioEventQueue);
+			return m_SoundHandler.PauseClip(entityID, m_AudioEventQueue);
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
-			m_StreamHandler.PauseClip(entityID, m_AudioEventQueue);
+			return m_StreamHandler.PauseClip(entityID, m_AudioEventQueue);
 		}
+
+		return false;
 	}
 
-	void AudioEngine::UnpauseAudio(uint64_t entityID)
+	bool AudioEngine::UnpauseAudio(uint64_t entityID)
 	{
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
-			m_SoundHandler.UnPauseClip(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds());
+			return m_SoundHandler.UnPauseClip(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds());
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
-			m_StreamHandler.UnPauseClip(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds());
+			return m_StreamHandler.UnPauseClip(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds());
 		}
+
+		return false;
 	}
 
-	void AudioEngine::StopAudio(uint64_t entityID)
+	bool AudioEngine::StopAudio(uint64_t entityID)
 	{
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
 			m_SoundHandler.StopClip(entityID, m_AudioEventQueue, m_OnAudioFinish);
+
+			return true;
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
 			m_StreamHandler.StopClip(entityID, m_AudioEventQueue, m_OnAudioFinish);
+
+			return true;
 		}
+
+		return false;
 	}
 
-	void AudioEngine::SetAudioLoopState(uint64_t entityID, bool loop)
+	bool AudioEngine::SetAudioLoopState(uint64_t entityID, bool loop)
 	{
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
-			m_SoundHandler.SetLoopState(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), loop);
+			return m_SoundHandler.SetLoopState(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), loop);
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
-			m_StreamHandler.SetLoopState(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), loop);
+			return m_StreamHandler.SetLoopState(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), loop);
 		}
+
+		return false;
 	}
 
-	void AudioEngine::SetAudioMuteState(uint64_t entityID, bool mute)
+	bool AudioEngine::SetAudioMuteState(uint64_t entityID, bool mute)
 	{
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
-			m_SoundHandler.SetMuteState(entityID, mute);
+			return m_SoundHandler.SetMuteState(entityID, mute);
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
-			m_StreamHandler.SetMuteState(entityID, mute);
+			return m_StreamHandler.SetMuteState(entityID, mute);
 		}
+
+		return false;
 	}
 
-	void AudioEngine::SetAudioVolume(uint64_t entityID, float volume)
+	bool AudioEngine::SetAudioVolume(uint64_t entityID, float volume)
 	{
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
-			m_SoundHandler.SetVolume(entityID, volume);
+			return m_SoundHandler.SetVolume(entityID, volume);
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
-			m_StreamHandler.SetVolume(entityID, volume);
+			return m_StreamHandler.SetVolume(entityID, volume);
 		}
+
+		return false;
 	}
 
-	void AudioEngine::SetAudioPitch(uint64_t entityID, float pitch)
+	bool AudioEngine::SetAudioPitch(uint64_t entityID, float pitch)
 	{
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
-			m_SoundHandler.SetPitch(entityID, pitch);
+			return m_SoundHandler.SetPitch(entityID, pitch);
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
-			m_StreamHandler.SetPitch(entityID, pitch);
+			return m_StreamHandler.SetPitch(entityID, pitch);
 		}
+
+		return false;
 	}
 
-	void AudioEngine::SetAudioPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance)
+	bool AudioEngine::SetAudioPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance)
 	{
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
-			m_SoundHandler.SetPosition(entityID, x, y, depth, minDistance, maxDistance);
+			return m_SoundHandler.SetPosition(entityID, x, y, depth, minDistance, maxDistance);
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
-			m_StreamHandler.SetPosition(entityID, x, y, depth, minDistance, maxDistance);
+			return m_StreamHandler.SetPosition(entityID, x, y, depth, minDistance, maxDistance);
 		}
+
+		return false;
 	}
 
-	void AudioEngine::SetSpatialMode(uint64_t entityID, bool isSpatial)
+	bool AudioEngine::SetSpatialMode(uint64_t entityID, bool isSpatial)
 	{
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
-			m_SoundHandler.SetSpatialState(entityID, isSpatial);
+			return m_SoundHandler.SetSpatialState(entityID, isSpatial);
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
-			m_StreamHandler.SetSpatialState(entityID, isSpatial);
+			return m_StreamHandler.SetSpatialState(entityID, isSpatial);
 		}
+
+		return false;
 	}
 
-    void AudioEngine::SetAudioOffsetTime(uint64_t entityID, float time)
+    bool AudioEngine::SetAudioOffsetTime(uint64_t entityID, float time)
     {
 		if (m_SoundHandler.HasEmitter(entityID))
 		{
-			m_SoundHandler.SetAudioOffsetTime(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), time);
+			return m_SoundHandler.SetAudioOffsetTime(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), time);
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
-			m_StreamHandler.SetAudioOffsetTime(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), time);
+			return m_StreamHandler.SetAudioOffsetTime(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), time);
 		}
+
+		return false;
     }
 
     float AudioEngine::GetAudioOffsetTime(uint64_t entityID)
@@ -166,7 +200,8 @@ namespace Mix {
 		{
 			return m_SoundHandler.GetAudioOffsetTime(entityID);
 		}
-		else if (m_StreamHandler.HasEmitter(entityID))
+
+		if (m_StreamHandler.HasEmitter(entityID))
 		{
 			return m_StreamHandler.GetAudioOffsetTime(entityID);
 		}
@@ -174,27 +209,50 @@ namespace Mix {
         return 0.0f;
     }
 
-	void AudioEngine::SetListenerPosition(float x, float y, float depth) const
+	bool AudioEngine::SetListenerPosition(float x, float y, float depth) const
 	{
         // causes backend issues if this isn't here, mainly because audio doesn't exist to offset other emitters
 		if (m_SoundHandler.HasEmitters() || m_StreamHandler.HasEmitters())
 		{
 			sf::Listener::setPosition(x, y, depth);
+
+			return true;
 		}
+
+		return false;
 	}
 
-	void AudioEngine::SetGlobalVolume(float volume) const
+	bool AudioEngine::SetGlobalVolume(float volume) const
 	{
         // causes backend issues if this isn't here, mainly because audio doesn't exist to offset other emitters
 		if (m_SoundHandler.HasEmitters() || m_StreamHandler.HasEmitters())
 		{
 			sf::Listener::setGlobalVolume(std::clamp(volume, 0.0f, 100.0f));
+
+			return true;
 		}
+
+		return false;
 	}
 
 	void AudioEngine::SetAudioFinishCallback(std::function<void(uint64_t)>&& callback)
 	{
 		m_OnAudioFinish = callback;
+	}
+
+	bool AudioEngine::HasHitMaxAudioSources() const
+	{
+		if (m_AudioEventQueue.size() >= c_MaxAudioEmitters)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	uint8_t AudioEngine::EmitterCount() const
+	{
+		return m_AudioEventQueue.size();
 	}
 
 	void AudioEngine::Update(float deltaTime)
@@ -205,32 +263,24 @@ namespace Mix {
 		// remove all finished sounds
 		while (!m_AudioEventQueue.empty() && m_CurrentTime.asSeconds() >= m_AudioEventQueue.begin()->stopTime)
 		{
-			const auto audioSourceID = m_AudioEventQueue.begin()->entityID;
+			const auto entityID = m_AudioEventQueue.begin()->entityID;
 
-			if (m_SoundHandler.HasEmitter(audioSourceID))
+			if (m_SoundHandler.HasEmitter(entityID))
 			{
-				m_OnAudioFinish(m_SoundHandler.GetEmitter(audioSourceID).entity);
-				m_SoundHandler.RemoveEmitter(audioSourceID);
+				m_SoundHandler.RemoveEmitter(entityID);
 			}
-			else if (m_StreamHandler.HasEmitter(audioSourceID))
+			else if (m_StreamHandler.HasEmitter(entityID))
 			{
-				m_OnAudioFinish(m_StreamHandler.GetEmitter(audioSourceID).entity);
-				m_StreamHandler.RemoveEmitter(audioSourceID);
+				m_StreamHandler.RemoveEmitter(entityID);
+			}
+
+			if (m_OnAudioFinish)
+			{
+				m_OnAudioFinish(entityID);
 			}
 
 			m_AudioEventQueue.erase(m_AudioEventQueue.begin());
 		}
-	}
-
-	bool AudioEngine::HasHitMaxAudioSources() const
-	{
-		if (m_AudioEventQueue.size() >= c_MaxAudioEmitters)
-		{
-			std::cerr << "Warning: Max audio reached! Cannot play more audio clips!" << std::endl;
-			return true;
-		}
-
-		return false;
 	}
 
 } // Mix

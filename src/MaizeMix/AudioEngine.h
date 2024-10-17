@@ -26,40 +26,51 @@ namespace Mix {
 		void RemoveClip(AudioClip& clip);
 
 		bool PlayAudio(uint64_t entityID, const AudioClip& clip, const AudioSpecification& spec);
-		void PauseAudio(uint64_t entityID);
-		void UnpauseAudio(uint64_t entityID);
-		void StopAudio(uint64_t entityID);
 
-		void SetAudioLoopState(uint64_t entityID, bool loop);
-		void SetAudioMuteState(uint64_t entityID, bool mute);
-		void SetAudioVolume(uint64_t entityID, float volume);
-		void SetAudioPitch(uint64_t entityID, float pitch);
-		void SetAudioPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance);
-		void SetSpatialMode(uint64_t entityID, bool isSpatial);
-        void SetAudioOffsetTime(uint64_t entityID, float time);
+		bool PauseAudio(uint64_t entityID);
+
+		bool UnpauseAudio(uint64_t entityID);
+
+		bool StopAudio(uint64_t entityID);
+
+		bool SetAudioLoopState(uint64_t entityID, bool loop);
+
+		bool SetAudioMuteState(uint64_t entityID, bool mute);
+
+		bool SetAudioVolume(uint64_t entityID, float volume);
+
+		bool SetAudioPitch(uint64_t entityID, float pitch);
+
+		bool SetAudioPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance);
+
+		bool SetSpatialMode(uint64_t entityID, bool isSpatial);
+
+        bool SetAudioOffsetTime(uint64_t entityID, float time);
 
 		float GetAudioOffsetTime(uint64_t entityID);
 
-		void SetListenerPosition(float x, float y, float depth) const;
-		void SetGlobalVolume(float volume) const;
+		bool SetListenerPosition(float x, float y, float depth) const;
+
+		bool SetGlobalVolume(float volume) const;
 
 		void SetAudioFinishCallback(std::function<void(uint64_t)>&& callback);
 
-		void Update(float deltaTime);
-
 		bool HasHitMaxAudioSources() const;
+
+		uint8_t EmitterCount() const;
+
+		void Update(float deltaTime);
 
 	 private:
 		sf::Time m_CurrentTime;
 
+		AudioManager m_AudioManager;
 		SoundHandler m_SoundHandler;
 		StreamHandler m_StreamHandler;
-		AudioManager m_AudioManager;
-
 		std::set<AudioEventData> m_AudioEventQueue;
 		std::function<void(uint64_t)> m_OnAudioFinish;
 
-		static constexpr uint8_t c_MaxAudioEmitters = 250;
+		static constexpr uint8_t c_MaxAudioEmitters = 255;
 	};
 
 } // Mix

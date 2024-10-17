@@ -6,6 +6,7 @@ FetchContent_MakeAvailable(Catch2)
 enable_testing()
 
 add_executable(test
+        AudioEngine.test.cpp
         AudioManager.test.cpp
         SoundHandler.test.cpp
         StreamHandler.test.cpp
