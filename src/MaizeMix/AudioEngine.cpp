@@ -149,36 +149,6 @@ namespace Mix {
 		return false;
 	}
 
-	bool AudioEngine::SetAudioPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance)
-	{
-		if (m_SoundHandler.HasEmitter(entityID))
-		{
-			return m_SoundHandler.SetPosition(entityID, x, y, depth, minDistance, maxDistance);
-		}
-
-		if (m_StreamHandler.HasEmitter(entityID))
-		{
-			return m_StreamHandler.SetPosition(entityID, x, y, depth, minDistance, maxDistance);
-		}
-
-		return false;
-	}
-
-	bool AudioEngine::SetSpatialMode(uint64_t entityID, bool isSpatial)
-	{
-		if (m_SoundHandler.HasEmitter(entityID))
-		{
-			return m_SoundHandler.SetSpatialState(entityID, isSpatial);
-		}
-
-		if (m_StreamHandler.HasEmitter(entityID))
-		{
-			return m_StreamHandler.SetSpatialState(entityID, isSpatial);
-		}
-
-		return false;
-	}
-
     bool AudioEngine::SetAudioOffsetTime(uint64_t entityID, float time)
     {
 		if (m_SoundHandler.HasEmitter(entityID))

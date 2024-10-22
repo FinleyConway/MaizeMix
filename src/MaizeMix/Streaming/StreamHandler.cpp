@@ -20,9 +20,6 @@ namespace Mix {
 			stream.SetVolume(specification.mute ? 0.0f :std::clamp(specification.volume, 0.0f, 100.0f));
 			stream.SetPitch(std::max(0.0001f, specification.pitch));
 			stream.SetLoop(specification.loop);
-			stream.SetPosition(specification.x, specification.y, specification.depth);
-			stream.SetMinDistance(specification.minDistance);
-			stream.SetMaxDistance(specification.maxDistance);
 			stream.Play();
 
 			return true;
@@ -148,50 +145,6 @@ namespace Mix {
 		if (streamData.IsValid())
 		{
 			streamData.music.SetPitch(std::max(0.0001f, pitch));
-
-			return true;
-		}
-
-		return false;
-	}
-
-	bool StreamHandler::SetPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance)
-	{
-		auto& streamData = m_CurrentPlayingAudio.at(entityID);
-		auto& stream = streamData.music;
-
-		if (streamData.IsValid())
-		{
-			// sounds should always be at position 0 if its relative, so it acts as 2D
-			if (!stream.IsRelativeToListener())
-			{
-				stream.SetPosition(x, y, depth);
-				stream.SetMinDistance(minDistance);
-				stream.SetMinDistance(maxDistance);
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	bool StreamHandler::SetSpatialState(uint64_t entityID, bool isSpatial)
-	{
-		auto& streamData = m_CurrentPlayingAudio.at(entityID);
-		auto& stream = streamData.music;
-
-		if (streamData.IsValid())
-		{
-			if (isSpatial)
-			{
-				stream.SetRelativeToListener(false);
-			}
-			else
-			{
-				stream.SetRelativeToListener(true);
-				stream.SetPosition(0, 0, 0);
-			}
 
 			return true;
 		}

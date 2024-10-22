@@ -15,7 +15,7 @@ namespace Mix {
 		{
 		}
 
-		bool operator<(AudioEventData other) const
+		bool operator<(const AudioEventData& other) const
 		{
 			if (stopTime == other.stopTime)
 			{
@@ -33,16 +33,9 @@ namespace Mix {
 		float volume = 0.0f;
 		float pitch = 0.0f;
 
-		float x = 0.0f;
-		float y = 0.0f;
-		float depth = 0.0f;
-
-		float minDistance = 0.0f;
-		float maxDistance = 0.0f;
-
 		AudioSpecification() = default;
-		AudioSpecification(bool loop, bool mute, float volume, float pitch, float x, float y, float depth, float minDistance, float maxDistance)
-			: mute(mute), loop(loop), volume(volume), pitch(pitch), x(x), y(y), depth(depth), minDistance(minDistance), maxDistance(maxDistance)
+		AudioSpecification(bool loop, bool mute, float volume, float pitch)
+			: mute(mute), loop(loop), volume(volume), pitch(pitch)
 		{
 		}
 	};

@@ -12,11 +12,18 @@ struct AudioContext
 struct AudioSource
 {
 	Mix::AudioClip clip;
+
 	bool loop = false;
 	bool mute = false;
+
 	float volume = 100;
 	float pitch = 1;
 	float time = 0;
+};
+
+struct AudioListener
+{
+	float volume = 0;
 };
 
 struct AudioSourcePlay { };
@@ -25,6 +32,12 @@ struct AudioSourceUnPause { };
 struct AudioSourceStop { };
 struct AudioSourcePlaying { };
 
+struct AudioClips
+{
+	Mix::AudioClip sound;
+	Mix::AudioClip stream;
+};
+
 void OnAudioSourcePlay(flecs::entity entity, AudioSourcePlay)
 {
 	const auto* context = entity.world().get<AudioContext>();
@@ -32,13 +45,11 @@ void OnAudioSourcePlay(flecs::entity entity, AudioSourcePlay)
 	if (const auto* source = entity.get<AudioSource>())
 	{
 		const auto spec = Mix::AudioSpecification(
-			source->loop,
-			source->mute,
-			source->volume,
-			source->pitch,
-			0, 0, 0,
-			0, 0
-		);
+				source->loop,
+				source->mute,
+				source->volume,
+				source->pitch
+			);
 
 		context->engine->PlayAudio(entity, source->clip, spec);
 
@@ -82,6 +93,7 @@ void UpdatePlayingAudio(flecs::entity entity, AudioSource& source, AudioSourcePl
 	auto* engine = context->engine;
 
 	engine->Update(deltaTime);
+
 	engine->SetAudioLoopState(entity, source.loop);
 	engine->SetAudioMuteState(entity, source.mute);
 	engine->SetAudioVolume(entity, source.volume);
@@ -91,7 +103,7 @@ void UpdatePlayingAudio(flecs::entity entity, AudioSource& source, AudioSourcePl
 	source.time = engine->GetAudioOffsetTime(entity);
 }
 
-void AudioConfig(flecs::entity entity, AudioSource& source)
+void AudioConfig(flecs::entity entity, AudioSource& source, const AudioClips& clips)
 {
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FramePadding = { 2, 2 };
@@ -121,16 +133,21 @@ void AudioConfig(flecs::entity entity, AudioSource& source)
 
 		// mute and loop
 		ImGui::Checkbox("Mute", &source.mute); ImGui::SameLine();
-		ImGui::Checkbox("Loop", &source.loop); ImGui::SameLine();
+		ImGui::Checkbox("Loop", &source.loop);
+
+		// need to detect audio clip change
+		if (ImGui::Button("Assign Sound")) source.clip = clips.sound; ImGui::SameLine();
+		if (ImGui::Button("Assign Stream")) source.clip = clips.stream;
 	}
 	ImGui::End();
 }
 
 int main()
 {
-	auto window = sf::RenderWindow(sf::VideoMode(500, 500), "Sandbox");
+	auto window = sf::RenderWindow(sf::VideoMode(1024, 1024), "Sandbox");
 	window.setFramerateLimit(60);
 	if (!ImGui::SFML::Init(window)) return 1;
+	auto view = sf::View({ 0, 0 }, sf::Vector2f(window.getSize()));
 
 	flecs::world world;
 	Mix::AudioEngine engine;
@@ -150,11 +167,13 @@ int main()
 	world.observer<AudioSourceUnPause>().event(flecs::OnAdd).each(OnAudioSourceUnPause);
 	world.observer<AudioSourceStop>().event(flecs::OnAdd).each(OnAudioSourceStop);
 
+	world.system<AudioSource, const AudioClips>().each(AudioConfig);
 	world.system<AudioSource, const AudioSourcePlaying>().each(UpdatePlayingAudio);
-	world.system<AudioSource>().each(AudioConfig);
 
 	world.set(AudioContext(&engine));
-	world.entity().set(AudioSource(stream));
+
+	world.entity().set(AudioListener(100)).add<sf::CircleShape>();
+	world.entity().set(AudioSource(sound)).set(AudioClips(sound, stream)).add<sf::CircleShape>();
 
 	sf::Clock clock;
 
@@ -170,11 +189,17 @@ int main()
 			{
 				window.close();
 			}
+			else if (event.type == sf::Event::Resized)
+			{
+				view.setSize(event.size.width, event.size.height);
+			}
 		}
 
 		float deltaTime = clock.restart().asSeconds();
 
 		ImGui::SFML::Update(window, sf::seconds(deltaTime));
+
+		window.setView(view);
 
 		window.clear();
 		world.progress(deltaTime);

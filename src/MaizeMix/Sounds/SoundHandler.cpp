@@ -25,9 +25,6 @@ namespace Mix {
 			sound.setVolume(specification.mute ? 0.0f :std::clamp(specification.volume, 0.0f, 100.0f));
 			sound.setPitch(std::max(0.0001f, specification.pitch));
 			sound.setLoop(specification.loop);
-			sound.setPosition(specification.x, specification.y, specification.depth);
-			sound.setMinDistance(specification.minDistance);
-			sound.setAttenuation(specification.maxDistance);
 			sound.play();
 
 			return true;
@@ -117,7 +114,7 @@ namespace Mix {
 	bool SoundHandler::SetMuteState(uint64_t entityID, bool mute)
 	{
 		auto& soundData = m_CurrentPlayingAudio.at(entityID);
-		const float volume = mute ? 0.0f : soundData.sound.getVolume();;
+		const float volume = mute ? 0.0f : soundData.sound.getVolume();
 
 		// check to see if it's either a music clip or sound effect clip
 		if (soundData.IsValid())
@@ -154,52 +151,6 @@ namespace Mix {
 		if (soundData.IsValid())
 		{
 			soundData.sound.setPitch(std::max(0.0001f, pitch));
-
-			return true;
-		}
-
-		return false;
-	}
-
-	bool SoundHandler::SetPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance)
-	{
-		auto& soundData = m_CurrentPlayingAudio.at(entityID);
-		auto& sound = soundData.sound;
-
-		if (soundData.IsValid())
-		{
-
-			// sounds should always be at position 0 if its relative, so it acts as 2D
-			if (!sound.isRelativeToListener())
-			{
-				sound.setPosition(x, y, depth);
-				sound.setMinDistance(minDistance);
-				sound.setMinDistance(maxDistance);
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	bool SoundHandler::SetSpatialState(uint64_t entityID, bool isSpatial)
-	{
-		auto& soundData = m_CurrentPlayingAudio.at(entityID);
-
-		if (soundData.IsValid())
-		{
-			auto& sound = soundData.sound;
-
-			if (isSpatial)
-			{
-				sound.setRelativeToListener(false);
-			}
-			else
-			{
-				sound.setRelativeToListener(true);
-				sound.setPosition(0, 0, 0);
-			}
 
 			return true;
 		}

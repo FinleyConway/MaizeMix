@@ -8,9 +8,9 @@
 	- Audio clip management
 	- Play, Pause, UnPause and Stop Audio
 	- Alter the functionality of the playing audio
-	- Spatialization 
+	- Spatialization (todo)
 	- Callbacks for finished audio
-	- Audio listener position
+	- Audio listener position (todo)
 	- Audio listener volume (global volume change)
 
 

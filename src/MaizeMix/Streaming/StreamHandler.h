@@ -32,10 +32,6 @@ namespace Mix {
 
 		bool SetPitch(uint64_t entityID, float pitch);
 
-		bool SetPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance);
-
-		bool SetSpatialState(uint64_t entityID, bool isSpatial);
-
 		bool SetAudioOffsetTime(uint64_t entityID, std::set<AudioEventData>& event, float currentTime, float time);
 
 		float GetAudioOffsetTime(uint64_t entityID);
@@ -49,7 +45,7 @@ namespace Mix {
 		bool HasEmitters() const;
 
 	private:
-		bool RequeueAudioClip(uint64_t entityID, const Music& stream, float currentTime, Stream& streamData, std::set<AudioEventData>& event);
+		static bool RequeueAudioClip(uint64_t entityID, const Music& stream, float currentTime, Stream& streamData, std::set<AudioEventData>& event);
 
 		void HandleInvalid(uint64_t entityID, const Stream& streamData, std::set<AudioEventData>& event);
 

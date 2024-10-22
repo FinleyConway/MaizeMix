@@ -41,10 +41,6 @@ namespace Mix {
 
 		bool SetAudioPitch(uint64_t entityID, float pitch);
 
-		bool SetAudioPosition(uint64_t entityID, float x, float y, float depth, float minDistance, float maxDistance);
-
-		bool SetSpatialMode(uint64_t entityID, bool isSpatial);
-
         bool SetAudioOffsetTime(uint64_t entityID, float time);
 
 		float GetAudioOffsetTime(uint64_t entityID);
