@@ -46,15 +46,11 @@ add_library(MaizeMix ${LIB_TYPE}
         src/MaizeMix/Helper/AudioManager.cpp
         src/MaizeMix/Helper/AudioManager.h
 
-        src/MaizeMix/Sounds/SoundHandler.cpp
-        src/MaizeMix/Sounds/SoundHandler.h
         src/MaizeMix/Sounds/SoundBuffer.cpp
         src/MaizeMix/Sounds/SoundBuffer.h
 
-        src/MaizeMix/Streaming/StreamHandler.cpp
         src/MaizeMix/Streaming/SoundReference.h
         src/MaizeMix/Streaming/SoundReference.cpp
-        src/MaizeMix/Streaming/StreamHandler.h
         src/MaizeMix/Streaming/Music.cpp
         src/MaizeMix/Streaming/Music.h
 

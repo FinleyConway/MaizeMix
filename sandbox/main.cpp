@@ -2,6 +2,7 @@
 #include <flecs.h>
 #include <imgui.h>
 #include <imgui-SFML.h>
+#include <iostream>
 #include <MaizeMix.h>
 
 struct AudioContext

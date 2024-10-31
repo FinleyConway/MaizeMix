@@ -10,7 +10,7 @@ namespace Mix {
 
 		for (auto* it : music)
 		{
-			it->ResetReference();
+			it->resetReference();
 		}
 	}
 

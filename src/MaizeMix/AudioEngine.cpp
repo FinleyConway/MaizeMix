@@ -31,10 +31,10 @@ namespace Mix {
 
 			if (clip.IsLoadInBackground())
 			{
-				return m_StreamHandler.PlayClip(entityID, static_cast<SoundReference&>(*handle), spec, m_AudioEventQueue, m_CurrentTime.asSeconds());
+				return PlayClip(entityID, static_cast<SoundReference&>(*handle), spec, m_AudioEventQueue, m_CurrentTime.asSeconds());
 			}
 
-			return m_SoundHandler.PlayClip(entityID, static_cast<SoundBuffer&>(*handle), spec, m_AudioEventQueue, m_CurrentTime.asSeconds());
+			return PlayClip(entityID, static_cast<SoundBuffer&>(*handle), spec, m_AudioEventQueue, m_CurrentTime.asSeconds());
 		}
 
 		return false;
@@ -42,147 +42,179 @@ namespace Mix {
 
 	bool AudioEngine::PauseAudio(uint64_t entityID)
 	{
-		if (m_SoundHandler.HasEmitter(entityID))
+		if (!m_CurrentPlayingAudio.contains(entityID)) return false;
+
+		auto& source = m_CurrentPlayingAudio.at(entityID);
+
+		if (!source.IsValid())
 		{
-			return m_SoundHandler.PauseClip(entityID, m_AudioEventQueue);
+			HandleInvalid(entityID, source.iterator);
+			return false;
 		}
 
-		if (m_StreamHandler.HasEmitter(entityID))
+		return std::visit([&](auto& emitter)
 		{
-			return m_StreamHandler.PauseClip(entityID, m_AudioEventQueue);
-		}
+			// pause only if it is playing
+			if (emitter.getStatus() == sf::SoundSource::Playing)
+			{
+				// pause the audio and remove it from the event queue
+				emitter.pause();
+				m_AudioEventQueue.erase(source.iterator);
 
-		return false;
+				return true;
+			}
+
+			return false;
+		}, source.source);
 	}
 
 	bool AudioEngine::UnpauseAudio(uint64_t entityID)
 	{
-		if (m_SoundHandler.HasEmitter(entityID))
+		if (!m_CurrentPlayingAudio.contains(entityID)) return false;
+
+		auto& source = m_CurrentPlayingAudio.at(entityID);
+
+		if (!source.IsValid())
 		{
-			return m_SoundHandler.UnPauseClip(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds());
+			HandleInvalid(entityID, source.iterator);
+			return false;
 		}
 
-		if (m_StreamHandler.HasEmitter(entityID))
+		return std::visit([&](auto& emitter)
 		{
-			return m_StreamHandler.UnPauseClip(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds());
-		}
+			// pause only if it is playing
+			if (emitter.getStatus() == sf::SoundSource::Paused)
+			{
+				// pause the audio and remove it from the event queue
+				emitter.play();
 
-		return false;
+				return RequeueAudioClip(entityID, source.GetDuration(), emitter.getPlayingOffset().asSeconds(), emitter.getLoop(), m_CurrentTime.asSeconds(), source);
+			}
+
+			return false;
+		}, source.source);
 	}
 
 	bool AudioEngine::StopAudio(uint64_t entityID)
 	{
-		if (m_SoundHandler.HasEmitter(entityID))
-		{
-			m_SoundHandler.StopClip(entityID, m_AudioEventQueue, m_OnAudioFinish);
+		if (!m_CurrentPlayingAudio.contains(entityID)) return false;
 
-			return true;
-		}
+		auto& source = m_CurrentPlayingAudio.at(entityID);
 
-		if (m_StreamHandler.HasEmitter(entityID))
-		{
-			m_StreamHandler.StopClip(entityID, m_AudioEventQueue, m_OnAudioFinish);
+		std::visit([&](auto& emitter) { emitter.stop(); }, source.source);
 
-			return true;
-		}
+		// trigger event handle any outside finished logic
+		if (m_OnAudioFinish) m_OnAudioFinish(source.entity);
 
-		return false;
+		HandleInvalid(entityID, source.iterator); // despite the name, it just removes it
+
+		return true;
 	}
 
 	bool AudioEngine::SetAudioLoopState(uint64_t entityID, bool loop)
 	{
-		if (m_SoundHandler.HasEmitter(entityID))
-		{
-			return m_SoundHandler.SetLoopState(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), loop);
-		}
+		if (!m_CurrentPlayingAudio.contains(entityID)) return false;
 
-		if (m_StreamHandler.HasEmitter(entityID))
-		{
-			return m_StreamHandler.SetLoopState(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), loop);
-		}
+		auto& source = m_CurrentPlayingAudio.at(entityID);
 
-		return false;
+		if (!source.IsValid()) return false;
+
+		return std::visit([&](auto& emitter)
+		{
+			if (emitter.getLoop() == loop) return false; // leave function if the same state
+			emitter.setLoop(loop);
+
+			return RequeueAudioClip(entityID, source.GetDuration(), emitter.getPlayingOffset().asSeconds(), emitter.getLoop(), m_CurrentTime.asSeconds(), source);
+		}, source.source);
 	}
 
 	bool AudioEngine::SetAudioMuteState(uint64_t entityID, bool mute)
 	{
-		if (m_SoundHandler.HasEmitter(entityID))
-		{
-			return m_SoundHandler.SetMuteState(entityID, mute);
-		}
+		if (!m_CurrentPlayingAudio.contains(entityID)) return false;
 
-		if (m_StreamHandler.HasEmitter(entityID))
-		{
-			return m_StreamHandler.SetMuteState(entityID, mute);
-		}
+		auto& source = m_CurrentPlayingAudio.at(entityID);
 
-		return false;
+		if (!source.IsValid()) return false;
+
+		return std::visit([&](auto& emitter)
+		{
+			const float volume = mute ? 0.0f : emitter.getVolume();
+
+			source.isMute = mute;
+			emitter.setVolume(volume);
+
+			return true;
+		}, source.source);
 	}
 
 	bool AudioEngine::SetAudioVolume(uint64_t entityID, float volume)
 	{
-		if (m_SoundHandler.HasEmitter(entityID))
-		{
-			return m_SoundHandler.SetVolume(entityID, volume);
-		}
+		if (!m_CurrentPlayingAudio.contains(entityID)) return false;
 
-		if (m_StreamHandler.HasEmitter(entityID))
-		{
-			return m_StreamHandler.SetVolume(entityID, volume);
-		}
+		auto& source = m_CurrentPlayingAudio.at(entityID);
 
-		return false;
+		if (source.isMute) return false;
+		if (!source.IsValid()) return false;
+
+		std::visit([&](auto& emitter) { emitter.setVolume(std::clamp(volume, 0.0f, 100.0f)); }, source.source);
+
+		return true;
 	}
 
 	bool AudioEngine::SetAudioPitch(uint64_t entityID, float pitch)
 	{
-		if (m_SoundHandler.HasEmitter(entityID))
-		{
-			return m_SoundHandler.SetPitch(entityID, pitch);
-		}
+		if (!m_CurrentPlayingAudio.contains(entityID)) return false;
 
-		if (m_StreamHandler.HasEmitter(entityID))
-		{
-			return m_StreamHandler.SetPitch(entityID, pitch);
-		}
+		auto& source = m_CurrentPlayingAudio.at(entityID);
 
-		return false;
+		if (!source.IsValid()) return false;
+
+		std::visit([&](auto& emitter) { emitter.setPitch(std::max(0.0001f, pitch)); }, source.source);
+
+		return true;
 	}
 
     bool AudioEngine::SetAudioOffsetTime(uint64_t entityID, float time)
     {
-		if (m_SoundHandler.HasEmitter(entityID))
-		{
-			return m_SoundHandler.SetAudioOffsetTime(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), time);
-		}
+		if (!m_CurrentPlayingAudio.contains(entityID)) return false;
 
-		if (m_StreamHandler.HasEmitter(entityID))
-		{
-			return m_StreamHandler.SetAudioOffsetTime(entityID, m_AudioEventQueue, m_CurrentTime.asSeconds(), time);
-		}
+		auto& source = m_CurrentPlayingAudio.at(entityID);
 
-		return false;
+		if (!source.IsValid()) return false;
+
+		return std::visit([&](auto& emitter)
+		{
+			// don't need to update the position if they are "equal"
+			if (std::abs(time - source.previousTimeOffset) < std::numeric_limits<float>::epsilon()) return false;
+
+			emitter.setPlayingOffset(sf::seconds(time));
+
+			return RequeueAudioClip(entityID, source.GetDuration(), emitter.getPlayingOffset().asSeconds(), emitter.getLoop(), m_CurrentTime.asSeconds(), source);
+		}, source.source);
     }
 
     float AudioEngine::GetAudioOffsetTime(uint64_t entityID)
     {
-		if (m_SoundHandler.HasEmitter(entityID))
-		{
-			return m_SoundHandler.GetAudioOffsetTime(entityID);
-		}
+		if (!m_CurrentPlayingAudio.contains(entityID)) return false;
 
-		if (m_StreamHandler.HasEmitter(entityID))
-		{
-			return m_StreamHandler.GetAudioOffsetTime(entityID);
-		}
+		auto& source = m_CurrentPlayingAudio.at(entityID);
 
-        return 0.0f;
+		if (!source.IsValid()) return false;
+
+		return std::visit([&](auto& emitter)
+		{
+			const float offset = emitter.getPlayingOffset().asSeconds();
+
+			source.previousTimeOffset = offset;
+
+			return offset;
+		}, source.source);
     }
 
 	bool AudioEngine::SetListenerPosition(float x, float y, float depth) const
 	{
         // causes backend issues if this isn't here, mainly because audio doesn't exist to offset other emitters
-		if (m_SoundHandler.HasEmitters() || m_StreamHandler.HasEmitters())
+		if (!m_CurrentPlayingAudio.empty())
 		{
 			sf::Listener::setPosition(x, y, depth);
 
@@ -195,7 +227,7 @@ namespace Mix {
 	bool AudioEngine::SetGlobalVolume(float volume) const
 	{
         // causes backend issues if this isn't here, mainly because audio doesn't exist to offset other emitters
-		if (m_SoundHandler.HasEmitters() || m_StreamHandler.HasEmitters())
+		if (!m_CurrentPlayingAudio.empty())
 		{
 			sf::Listener::setGlobalVolume(std::clamp(volume, 0.0f, 100.0f));
 
@@ -233,23 +265,52 @@ namespace Mix {
 		// remove all finished sounds
 		while (!m_AudioEventQueue.empty() && m_CurrentTime.asSeconds() >= m_AudioEventQueue.begin()->stopTime)
 		{
-			const auto entityID = m_AudioEventQueue.begin()->entityID;
+			const uint64_t entityID = m_AudioEventQueue.begin()->entityID;
 
-			if (m_SoundHandler.HasEmitter(entityID))
+			if (m_CurrentPlayingAudio.contains(entityID))
 			{
-				m_SoundHandler.RemoveEmitter(entityID);
-			}
-			else if (m_StreamHandler.HasEmitter(entityID))
-			{
-				m_StreamHandler.RemoveEmitter(entityID);
-			}
+				m_CurrentPlayingAudio.erase(entityID);
 
-			if (m_OnAudioFinish)
-			{
-				m_OnAudioFinish(entityID);
+				if (m_OnAudioFinish)
+				{
+					m_OnAudioFinish(entityID);
+				}
 			}
 
 			m_AudioEventQueue.erase(m_AudioEventQueue.begin());
+		}
+	}
+
+	bool AudioEngine::RequeueAudioClip(uint64_t entityID, float duration, float playingOffset, bool isLooping, float currentTime, Source& source)
+	{
+		// calculate the remaining play time
+		const float playingTimeLeft = duration - playingOffset;
+		const float stopTime = isLooping ? std::numeric_limits<float>::max() : currentTime + playingTimeLeft;
+
+		// remove existing event to avoid duplicates
+		if (m_AudioEventQueue.contains(*source.iterator)) m_AudioEventQueue.erase(source.iterator);
+
+		// attempt to reinsert with new stop time
+		const auto [it, successful] = m_AudioEventQueue.emplace(entityID, stopTime);
+		if (successful)
+		{
+			source.iterator = it;
+			return true;
+		}
+
+		return false;
+	}
+
+	void AudioEngine::HandleInvalid(uint64_t entityID, EventIterator it)
+	{
+		if (m_AudioEventQueue.contains(*it))
+		{
+			m_AudioEventQueue.erase(it);
+		}
+
+		if (m_CurrentPlayingAudio.contains(entityID))
+		{
+			m_CurrentPlayingAudio.erase(entityID);
 		}
 	}
 
