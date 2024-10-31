@@ -1,7 +1,7 @@
 #include "MaizeMix/AudioEngine.h"
 
-#include "MaizeMix/Streaming/SoundReference.h"
-#include "MaizeMix/Sounds/SoundBuffer.h"
+#include "MaizeMix/Helper/AudioClips/SoundReference.h"
+#include "MaizeMix/Helper/AudioClips/SoundBuffer.h"
 #include "MaizeMix/AudioClip.h"
 
 #include <iostream>

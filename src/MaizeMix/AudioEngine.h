@@ -8,12 +8,11 @@
 #include <memory>
 #include <set>
 
-#include "MaizeMix/Streaming/SoundReference.h"
-#include "MaizeMix/Helper/AudioManager.h"
+#include "MaizeMix/Helper/AudioClips/SoundReference.h"
+#include "MaizeMix/Helper/AudioClips/SoundBuffer.h"
 #include "MaizeMix/Helper/AudioSpecification.h"
-#include "MaizeMix/Streaming/Music.h"
-#include "MaizeMix/AudioClip.h"
-#include "Sounds/SoundBuffer.h"
+#include "MaizeMix/Helper/AudioManager.h"
+#include "MaizeMix/Helper/Music.h"
 
 namespace Mix {
 

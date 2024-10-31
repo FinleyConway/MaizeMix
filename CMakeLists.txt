@@ -41,19 +41,16 @@ else()
 endif()
 
 add_library(MaizeMix ${LIB_TYPE}
-        src/MaizeMix/Helper/Clip.h
-        src/MaizeMix/Helper/SoundData.h
+        src/MaizeMix/Helper/AudioClips/Clip.h
+        src/MaizeMix/Helper/AudioSpecification.h
         src/MaizeMix/Helper/AudioManager.cpp
         src/MaizeMix/Helper/AudioManager.h
-
-        src/MaizeMix/Sounds/SoundBuffer.cpp
-        src/MaizeMix/Sounds/SoundBuffer.h
-
-        src/MaizeMix/Streaming/SoundReference.h
-        src/MaizeMix/Streaming/SoundReference.cpp
-        src/MaizeMix/Streaming/Music.cpp
-        src/MaizeMix/Streaming/Music.h
-
+        src/MaizeMix/Helper/AudioClips/SoundBuffer.cpp
+        src/MaizeMix/Helper/AudioClips/SoundBuffer.h
+        src/MaizeMix/Helper/AudioClips/SoundReference.h
+        src/MaizeMix/Helper/AudioClips/SoundReference.cpp
+        src/MaizeMix/Helper/Music.cpp
+        src/MaizeMix/Helper/Music.h
         src/MaizeMix/AudioClip.cpp
         src/MaizeMix/AudioClip.h
         src/MaizeMix/AudioEngine.cpp
